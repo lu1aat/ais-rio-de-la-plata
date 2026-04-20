@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIS Rio de la Plata</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0a0f1e;
+      color: #c8d8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid #1e3a5f;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo { font-size: 2.5rem; line-height: 1; }
+
+    .site-title h1 {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #7dd3fc;
+      letter-spacing: 0.05em;
+    }
+
+    .site-title p {
+      font-size: 0.8rem;
+      color: #4a7a9b;
+      margin-top: 0.2rem;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: #4a7a9b;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      border-left: 2px solid #1e3a5f;
+      padding-left: 0.75rem;
+    }
+
+    .posts {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: #1e3a5f;
+      border: 1px solid #1e3a5f;
+    }
+
+    .post-card {
+      background: #0d1a2e;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.15s;
+    }
+
+    .post-card:hover { background: #112240; }
+
+    .post-num {
+      font-size: 0.75rem;
+      color: #4a7a9b;
+      min-width: 2.5rem;
+    }
+
+    .post-title {
+      color: #7dd3fc;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .post-desc {
+      color: #6b8fa8;
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #2a4a6a;
+      font-size: 0.75rem;
+    }
+
+    footer a { color: #4a7a9b; text-decoration: none; }
+    footer a:hover { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🛳️⚓📡</div>
+  <div class="site-title">
+    <h1>AIS · Rio de la Plata</h1>
+    <p>Actividad maritima · Datos y analisis</p>
+  </div>
+</header>
+
+<main>
+
+  <p class="section-label">Publicaciones</p>
+
+  <div class="posts">
+
+    <a class="post-card" href="posts/01-sw-empress/">
+      <span class="post-num">#1</span>
+      <div>
+        <div class="post-title">SW EMPRESS</div>
+        <div class="post-desc"></div>
+      </div>
+    </a>
+
+  </div>
+
+</main>
+
+<footer>
+  <p>Datos capturados en el Rio de la Plata &mdash; <a href="https://github.com/lu1aat/ais-rio-de-la-plata">github.com/lu1aat/ais-rio-de-la-plata</a></p>
+</footer>
+
+</body>
+</html>
