@@ -3,16 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>#1 SW EMPRESS — AIS Rio de la Plata</title>
+  <title>SW EMPRESS — AIS Rio de la Plata</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Courier New', monospace;
+      font-family: 'Inter', system-ui, sans-serif;
       background: #0a0f1e;
       color: #c8d8f0;
       min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
     }
+
+    .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
     header {
       border-bottom: 1px solid #1e3a5f;
@@ -20,43 +31,374 @@
       display: flex;
       align-items: center;
       gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    .logo { font-size: 1.5rem; line-height: 1; text-decoration: none; }
+    .logo { font-size: 1.4rem; line-height: 1; text-decoration: none; }
 
     .site-title a {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #4a7a9b;
       text-decoration: none;
+      letter-spacing: 0.04em;
     }
     .site-title a:hover { color: #7dd3fc; }
 
     main {
-      max-width: 860px;
-      margin: 4rem auto;
+      margin: 3.5rem auto;
       padding: 0 2rem;
     }
 
     .post-meta {
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
       color: #4a7a9b;
       text-transform: uppercase;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.6rem;
     }
 
     h1 {
-      font-size: 2rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 1.75rem;
+      color: #e8f4ff;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 0.4rem;
+    }
+
+    .post-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #4a7a9b;
+      margin-bottom: 2rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── intro block ─────────────────────────────────── */
+    .intro {
+
+    }
+
+    .intro p {
+      font-size: 0.95rem;
+      color: #a8c0d8;
+      margin-bottom: 0.5rem;
+    }
+    .intro p:last-child { margin-bottom: 0; }
+
+    .news-links {
+      list-style: none;
+      margin: 0.6rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .news-links li { display: flex; align-items: baseline; gap: 0.4rem; }
+
+    .news-links li::before {
+      content: '→';
+      font-family: 'JetBrains Mono', monospace;
+      color: #4a7a9b;
+      flex-shrink: 0;
+    }
+
+    .news-links a {
+      color: #7dd3fc;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .news-links a:hover { text-decoration: underline; }
+
+    .news-links .source {
+      color: #4a7a9b;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    /* ── headings ────────────────────────────────────── */
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
       color: #7dd3fc;
       font-weight: bold;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 3rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    h3 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 1rem;
+      color: #a8c8e8;
+      font-weight: 600;
+      margin: 2rem 0 0.65rem;
+    }
+
+    /* ── body text ───────────────────────────────────── */
+    p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #b8cfe8;
+      margin-bottom: 1rem;
+    }
+
+    strong { color: #e8f4ff; font-weight: 600; }
+
+    em {
+      font-family: 'JetBrains Mono', monospace;
+      font-style: normal;
+      font-size: 0.88em;
+      color: #7dd3fc;
+      background: #0d1a2e;
+      border: 1px solid #1a3050;
+      padding: 0.05em 0.35em;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #0d1a2e;
+      border: 1px solid #1e3a5f;
+      padding: 0.1em 0.4em;
+      font-size: 0.83em;
+      color: #7dd3fc;
+    }
+
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── table ───────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      background: #0d1a2e;
+      color: #4a7a9b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #0f1e35;
+      vertical-align: top;
+      line-height: 1.55;
+      color: #b8cfe8;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #7dd3fc;
+      white-space: nowrap;
+      font-size: 0.82rem;
+      padding-right: 1rem;
+    }
+
+    /* ── map ─────────────────────────────────────────── */
+    #track-map {
+      width: 100%;
+      height: 480px;
+      margin: 1.5rem 0;
+      border: 1px solid #1e3a5f;
+      background: #0a1525;
+    }
+
+    .map-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #4a7a9b;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* track hover tooltip */
+    .pt-tooltip {
+      background: rgba(0,0,0,0.92) !important;
+      border: 1px solid #333 !important;
+      border-radius: 2px !important;
+      padding: 5px 9px !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.78em !important;
+      color: #FFB000 !important;
+      white-space: nowrap !important;
+      box-shadow: none !important;
+    }
+    .pt-tooltip .ts { color: #666; font-size: 0.85em; display: block; }
+    .pt-tooltip::before { display: none !important; }
+
+    /* map legend */
+    .map-legend {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .map-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #4a7a9b;
+    }
+    .map-legend-swatch {
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    /* custom map marker — balloon style */
+    .map-marker {
+      position: relative;
+      background: #0d1829;
+      border: 1px solid #7dd3fc;
+      border-radius: 5px;
+      padding: 4px 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: #c8e8ff;
+      white-space: nowrap;
+      line-height: 1.35;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      /* center horizontally, push up so the triangle tip sits on the coordinate */
+      transform: translateX(-50%) translateY(calc(-100% - 7px));
+    }
+    /* triangle pointer at bottom center */
+    .map-marker::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 7px solid #7dd3fc;
+    }
+    /* inner fill triangle to hide border */
+    .map-marker::before {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #0d1829;
+      z-index: 1;
+    }
+    .map-marker .mdate {
+      color: #7dd3fc;
+      display: block;
+      font-size: 9px;
+      font-weight: bold;
+      margin-bottom: 1px;
+    }
+
+    /* ── images ──────────────────────────────────────── */
+    .img-block { margin: 1.5rem 0; }
+
+    .img-block img {
+      width: 100%;
+      display: block;
+      border: 1px solid #1e3a5f;
+    }
+
+    .img-block.float-right {
+      float: right;
+      width: 30%;
+      margin: 0 0 1rem 1.5rem;
+    }
+
+    .clearfix::after { content: ''; display: table; clear: both; }
+
+    .img-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #4a7a9b;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── debate box ──────────────────────────────────── */
+    .debate-box {
+      border: 1px solid #1e3a5f;
+      margin: 1.5rem 0;
+    }
+
+    .debate-side { padding: 1rem 1.25rem; }
+
+    .debate-side + .debate-side { border-top: 1px solid #1e3a5f; }
+
+    .debate-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #4a7a9b;
+      margin-bottom: 0.5rem;
+    }
+
+    .debate-side p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+      color: #a0b8d0;
+    }
+
+    /* ── conclusion ──────────────────────────────────── */
+    .conclusion {
+    }
+
+    .conclusion p {
+      font-size: 0.92rem;
+      color: #a8c0d8;
+      margin-bottom: 0.75rem;
+    }
+    .conclusion p:last-child { margin-bottom: 0; }
+
+    /* ── post footer ─────────────────────────────────── */
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1e3a5f;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #4a7a9b;
+      line-height: 2;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1e3a5f;
+      margin: 2.5rem 0;
     }
 
     footer {
       text-align: center;
       padding: 3rem 2rem;
+      font-family: 'JetBrains Mono', monospace;
       color: #2a4a6a;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
     }
 
     footer a { color: #4a7a9b; text-decoration: none; }
@@ -66,20 +408,289 @@
 <body>
 
 <header>
-  <a class="logo" href="../../">🛳️⚓📡</a>
+  <a class="logo" href="../../">⚓📡</a>
   <div class="site-title">
     <a href="../../">AIS · Rio de la Plata</a>
   </div>
 </header>
 
 <main>
-  <p class="post-meta">Publicacion #1</p>
-  <h1>SW EMPRESS</h1>
+
+  <p class="post-meta">Publicación #01</p>
+  <h1>SW EMPRESS: Prospección Sísmica en la Plataforma Continental Uruguaya</h1>
+  <p class="post-date">17 de abril de 2026</p>
+
+  <div class="intro">
+    <p>Acusan de hacer exploración sísmica en la zona económica exclusiva (ZEE) de Uruguay 🇺🇾 al buque de bandera noruega 🇳🇴 <strong>SW Empress</strong>.</p>
+    <ul class="news-links">
+      <li>
+        <a href="https://www.uypress.net/Secciones/Cruzan-responsabilidades-Cancilleria-Ambiente-y-Ancap-por-buque-noruego-que-realizo-prospeccion-sin-autorizacion-uc152112" target="_blank" rel="noopener noreferrer">Cruzan responsabilidades Cancillería, Ambiente y Ancap por buque noruego que realizó prospección sin autorización</a>
+        <span class="source">— Uypress</span>
+      </li>
+      <li>
+        <a href="https://www.lr21.com.uy/ecologia/1494166-buque-noruego-hizo-exploracion-sismica-sin-permiso-en-uruguay-esta-en-el-puerto-de-montevideo" target="_blank" rel="noopener noreferrer">Buque noruego hizo exploración sísmica sin permiso en Uruguay: está en el Puerto de Montevideo</a>
+        <span class="source">— La Red 21</span>
+      </li>
+    </ul>
+    <p>ANCAP menciona que operarían en "aguas internacionales", pero el Gobierno reclama soberanía hasta las 350 millas.</p>
+  </div>
+
+  <!-- ── Reconstrucción AIS ────────────────────────── -->
+  <h2>Reconstrucción del viaje desde datos AIS</h2>
+
+  <p>Los datos del Sistema de Identificación Automática (AIS) permiten reconstruir el recorrido del buque entre el 2 y el 14 de abril de 2026.</p>
+
+  <table>
+    <thead>
+      <tr><th>Fecha</th><th>Evento</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>2 ABR</strong></td>
+        <td>Sale del Puerto de Rio Grande 🇧🇷 — destino AIS declarado: <code>OFFSHORE URUGUAY</code></td>
+      </tr>
+      <tr>
+        <td><strong>3 ABR</strong></td>
+        <td>Cambia estado AIS a <em>Restricted Manoeuvrability</em> en aguas del Atlántico Sur — posiblemente el inicio de las operaciones sísmicas</td>
+      </tr>
+      <tr>
+        <td><strong>3–13 ABR</strong></td>
+        <td>Permanece en estado <em>Restricted Manoeuvrability</em>; navega a baja velocidad (2–4 nudos) en la zona de trabajo</td>
+      </tr>
+      <tr>
+        <td><strong>12–13 ABR</strong></td>
+        <td>El buque de apoyo OCEAN DEE 🇳🇴 opera en las inmediaciones — múltiples eventos de proximidad registrados en AIS</td>
+      </tr>
+      <tr>
+        <td><strong>13 ABR</strong></td>
+        <td>Cruza el límite de la ZEE uruguaya de 200 mn; cambia estado a <em>Underway using Engine</em> y acelera hacia Montevideo</td>
+      </tr>
+      <tr>
+        <td><strong>14 ABR</strong></td>
+        <td>Arriba al Puerto de Montevideo 🇺🇾</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── Mapa interactivo ──────────────────────────── -->
+  <div id="track-map"></div>
+  <p class="map-caption">Recorrido del SW EMPRESS (2–17 ABR 2026) · Datos: MarineTraffic AIS Export · Pasar el cursor sobre el track para ver velocidad</p>
+  <div class="map-legend">
+    <div class="map-legend-item"><div class="map-legend-swatch" style="background:#2ecc71"></div>&gt; 8 kn — tránsito</div>
+    <div class="map-legend-item"><div class="map-legend-swatch" style="background:#f39c12"></div>4–8 kn</div>
+    <div class="map-legend-item"><div class="map-legend-swatch" style="background:#e74c3c"></div>1–4 kn</div>
+    <div class="map-legend-item"><div class="map-legend-swatch" style="background:#555"></div>&lt; 1 kn — fondeado</div>
+  </div>
+
+  <!-- ── Inicio de trabajos ────────────────────────── -->
+  <h3>Inicio de trabajos: cambio de estado a "Restricted Manoeuvrability"</h3>
+
+  <p>El <strong>3 de abril</strong>, el buque cambia su estado AIS de <em>Underway using Engine</em> a <em>Restricted Manoeuvrability</em> en las coordenadas <code>36°36'S, 50°30'W</code>.</p>
+
+  <p>El estado <em>Restricted Manoeuvrability</em> (Maniobra Restringida) es el estatus AIS que los buques sísmicos utilizan durante las operaciones de trabajo activo. Indica que el buque no puede maniobrar libremente porque está arrastrando equipos (streamer sísmico, air guns), lo que limita su capacidad de respuesta ante otras embarcaciones.</p>
+
+  <p>Este cambio de estado es consistente con el inicio de operaciones sísmicas activas, aunque no es posible confirmarlo con certeza solo a partir del AIS. La posición registrada en ese momento queda <strong>fuera de las 200 millas náuticas</strong> de la ZEE uruguaya.</p>
+
+  <!-- ── Zona de trabajo ───────────────────────────── -->
+  <h3>Zona de trabajo</h3>
+
+  <p>Durante aproximadamente <strong>diez días</strong> (3 al 13 de abril), el SW Empress mantuvo estado <em>Restricted Manoeuvrability</em> navegando a velocidades bajas (2–4 nudos). Este patrón —velocidad reducida, rumbos paralelos, posición sostenida— es compatible con operaciones de adquisición sísmica, aunque el AIS por sí solo no permite confirmar qué actividad específica se realizaba.</p>
+
+  <p>Según las coordenadas registradas, el área de operación se encontraría en el rango aproximado de <strong>270 a 320 millas náuticas</strong> desde las líneas de base uruguayas — dentro de la <strong>zona en disputa</strong> entre el límite de las 200 mn (ZEE) y el de las 350 mn (plataforma continental extendida reconocida por la ONU en 2016).</p>
+
+  <!-- ── El barco ─────────────────────────────────── -->
+  <h2>El barco</h2>
+
+  <h3>El SW EMPRESS: buque de prospeccion sismica</h3>
+  <div class="clearfix">
+    <div class="img-block float-right">
+      <img src="sw_empress.png" alt="SW EMPRESS">
+      <p class="img-caption">SW EMPRESS</p>
+    </div>
+
+    <p>El <strong>SW Empress</strong> (IMO: 9306026) es un buque sísmico de bandera noruega operado por <strong>Shearwater GeoServices</strong>, especializado en adquisición de datos sísmicos 2D y 3D. Fue contratado por la empresa <strong>Searcher</strong> para realizar un relevamiento de la plataforma continental en el Atlántico Sur.</p>
+  </div>
+
+  <!-- ── OCEAN DEE ──────────────────────────────────── -->
+  <h3>El OCEAN DEE: buque de apoyo sísmico</h3>
+
+  <div class="clearfix">
+    <div class="img-block float-right">
+      <img src="Screenshot_2026-04-18_00-17-10.png" alt="OCEAN DEE junto al SW Empress en AIS">
+      <p class="img-caption">OCEAN DEE y SW EMPRESS en los datos AIS</p>
+    </div>
+
+    <p>El <strong>12 y 13 de abril</strong>, los datos AIS registran múltiples eventos de <strong>proximidad entre el SW Empress y el OCEAN DEE</strong> (también de bandera noruega, operado por <strong>Atlantic Offshore</strong>).</p>
+
+    <p>El <strong>OCEAN DEE</strong> es un <em>seismic support vessel</em> de Atlantic Offshore (<a href="https://atlantic-offshore.no/fleets/ocean-dee/" target="_blank" rel="noopener noreferrer">ver flota</a>), diseñado para asistir a buques sísmicos en operaciones de campo. Su presencia en las inmediaciones reforzaría la hipótesis de que las operaciones del 12 y 13 de abril seguían activas, aunque no es posible determinarlo con certeza a partir del AIS.</p>
+  </div>
+
+  <!-- ── Ingreso ZEE ───────────────────────────────── -->
+  <h3>Ingreso a la ZEE de 200 mn y fin de trabajos</h3>
+
+  <p>El <strong>13 de abril</strong>, el SW Empress <strong>entra a la Zona Económica Exclusiva de Uruguay</strong> (200 mn) en las coordenadas <code>37°43'S, 52°30'W</code>, rumbo norte. En ese momento todavía registra estado <em>Restricted Manoeuvrability</em> y velocidad de 3–4 nudos — lo que podría indicar que las operaciones continuaban ya dentro de la ZEE convencional.</p>
+
+  <p>Horas más tarde, cambia su estado AIS de <em>Restricted Manoeuvrability</em> a <em>Underway using Engine</em> en las coordenadas <code>36°57'S, 53°10'W</code>, y acelera a 13 nudos. El salto de velocidad sugiere el fin de las operaciones y el inicio del tránsito hacia Montevideo. En ese mismo momento, el destino AIS cambia de <code>OFFSHORE URUGUAY</code> a <code>MONTEVIDEO</code>.</p>
+
+  <!-- ── Llegada ───────────────────────────────────── -->
+  <h3>Llegada a Montevideo</h3>
+
+  <p>El <strong>14 de abril</strong>, el SW Empress <strong>arriba al Puerto de Montevideo</strong>, asistido por los remolcadores VB Tero y VB Tannat. Permanece atracado en el puerto.</p>
+
+  <hr>
+
+  <!-- ── Debate de límites ─────────────────────────── -->
+  <h2>El debate de límites: 200 mn vs 350 mn</h2>
+
+  <p>El núcleo del conflicto es una disputa sobre qué norma aplica en la zona donde operó el buque.</p>
+
+  <div class="debate-box">
+    <div class="debate-side">
+      <p class="debate-label">Postura oficial — Cancillería y Ministerio de Ambiente</p>
+      <p>En <strong>2016</strong>, la Comisión de Límites de la Plataforma Continental de las Naciones Unidas (CLPC/CLCS) aprobó la extensión de la plataforma continental uruguaya hasta las <strong>350 millas náuticas</strong> desde las líneas de base. Esto significa que Uruguay ejerce derechos soberanos sobre el lecho y subsuelo marino en esa zona extendida, independientemente de si las aguas suprayacentes son internacionales. Cualquier actividad de exploración o explotación del subsuelo en esa zona requeriría autorización uruguaya.</p>
+    </div>
+    <div class="debate-side">
+      <p class="debate-label">Postura de ANCAP y Searcher</p>
+      <p>La gerencia de ANCAP y la empresa Searcher sostienen que, al no existir una <strong>ley del Parlamento uruguayo</strong> que ratifique internamente el límite de las 350 mn, la zona entre las 200 y las 350 mn sigue siendo jurídicamente tratada como aguas internacionales a efectos prácticos. Esto sustenta la afirmación —publicada brevemente en el sitio de ANCAP el 6 de abril y luego eliminada— de que el buque operó en "aguas internacionales".</p>
+    </div>
+  </div>
+
+  <p>Según los datos AIS, el área principal de trabajo del SW Empress se ubicaría <strong>fuera de las 200 mn</strong> pero <strong>dentro del límite de 350 mn</strong> reconocido por la ONU. Eso coloca las operaciones exactamente en el centro de la disputa jurídica.</p>
+
+  <hr>
+
+  <!-- ── Mapas ─────────────────────────────────────── -->
+  <h2>Mapas</h2>
+
+  <div class="gallery">
+    <div class="img-block">
+      <img src="Screenshot_2026-04-17_23-01-38.png" alt="Recorrido completo — ZEE 200 mn">
+      <p class="img-caption">Recorrido completo (MarineTraffic) — ZEE 200 mn</p>
+    </div>
+    <div class="img-block">
+      <img src="Screenshot_2026-04-17_23-06-36.png" alt="Recorrido completo — proyección ZEE 350 mn">
+      <p class="img-caption">Recorrido completo (MarineTraffic) — proyección ZEE 350 mn</p>
+    </div>
+    <div class="img-block">
+      <img src="Screenshot_2026-04-18_00-15-32.png" alt="Detalle zona de trabajo">
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ── Conclusión ────────────────────────────────── -->
+  <h2>Conclusión técnica</h2>
+
+  <div class="conclusion">
+    <p>Lo que los datos AIS muestran de forma objetiva es que el SW Empress mantuvo estado <em>Restricted Manoeuvrability</em> durante aproximadamente diez días en una zona que, según el aval de la ONU de 2016, formaría parte de la plataforma continental sobre la que Uruguay reclama derechos soberanos.</p><p>La presencia del OCEAN DEE, un buque de apoyo sísmico, sugiere que no se trató de un tránsito casual sino de una operación planificada.</p>
+    
+    <p>Lo que los datos AIS no pueden confirmar por sí solos es la naturaleza exacta de las actividades realizadas ni si existían autorizaciones de algún tipo. Esa es materia de la investigación en curso.</p>
+  </div>
+
+  <div class="post-footer">
+    <p>Datos: [<a href="positions.csv">positions.csv</a>] MarineTraffic AIS Export — SW EMPRESS, abril 2026. </p>
+    <p>Fuentes: Uypress, La Red 21</p>
+    <p>Análisis: LU1AAT / CX9CAT — <a href="https://lu1aat.github.io/ais-rio-de-la-plata/" target="_blank" rel="noopener noreferrer">AIS Rio de la Plata</a></p>
+  </div>
+
 </main>
 
 <footer>
   <a href="../../">← Volver al inicio</a>
 </footer>
+
+<script>
+(async function () {
+
+  // ── key events (from AIS voyage timeline) ────────────────────────────────
+  const EVENTS = [
+    { lat: -32.034,     lng: -52.098,     date: '2 ABR',    label: 'Rio Grande 🇧🇷',              color: '#4fc3f7' },
+    { lat: -36.600155,  lng: -50.510288,  date: '3 ABR',    label: 'Comienza tareas', color: '#e74c3c' },
+    { lat: -38.518333,  lng: -51.395,     date: '12–13 ABR',label: 'OCEAN DEE 🇳🇴',              color: '#f39c12' },
+    { lat: -37.731258,  lng: -52.504208,  date: '13 ABR',   label: 'ZEE 200 mn',                 color: '#f39c12' },
+    { lat: -34.892712,  lng: -56.201225,  date: '14 ABR',   label: 'Montevideo 🇺🇾',              color: '#2ecc71' },
+  ];
+
+  // ── color scale (from sw_empress_track2.html) ─────────────────────────────
+  function speedColor(spd) {
+    if (spd < 1) return '#555';
+    if (spd < 4) return '#e74c3c';
+    if (spd < 8) return '#f39c12';
+    return '#2ecc71';
+  }
+
+  // ── init map ──────────────────────────────────────────────────────────────
+  const map = L.map('track-map', { center: [-36.5, -52], zoom: 5, zoomControl: true });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+    maxZoom: 19, opacity: 0.45
+  }).addTo(map);
+
+  // ── load and parse CSV ────────────────────────────────────────────────────
+  let csvText;
+  try {
+    csvText = await fetch('positions.csv').then(r => r.text());
+  } catch (e) {
+    console.error('Could not load positions.csv', e);
+    return;
+  }
+
+  const points = csvText.trim().split('\n').slice(1).map(line => {
+    const [ts, speed, course, lat, lng] = line.split(',');
+    return { lat: parseFloat(lat), lng: parseFloat(lng), speed: parseFloat(speed), course: parseFloat(course), ts: ts.trim() };
+  }).filter(p => !isNaN(p.lat)).reverse(); // reverse: CSV is newest-first
+
+  // ── build track — group consecutive same-color segments ──────────────────
+  let i = 0;
+  while (i < points.length - 1) {
+    const color = speedColor(points[i].speed);
+    const seg = [[points[i].lat, points[i].lng]];
+    const segData = [points[i]];
+    let j = i + 1;
+    while (j < points.length && speedColor(points[j].speed) === color) {
+      seg.push([points[j].lat, points[j].lng]);
+      segData.push(points[j]);
+      j++;
+    }
+    if (j < points.length) seg.push([points[j].lat, points[j].lng]);
+
+    const midPt = segData[Math.floor(segData.length / 2)];
+    const tooltipHtml = `<span class="ts">${midPt.ts}</span>${midPt.speed} kn &nbsp;·&nbsp; ${midPt.course}°`;
+
+    L.polyline(seg, { color, weight: 2.5, opacity: 0.88, smoothFactor: 1 })
+      .bindTooltip(tooltipHtml, { sticky: true, className: 'pt-tooltip', offset: [10, 0] })
+      .addTo(map);
+
+    i = j;
+  }
+
+  // ── event balloon markers ─────────────────────────────────────────────────
+  EVENTS.forEach(ev => {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="map-marker"><span class="mdate">${ev.date}</span>${ev.label}</div>`,
+      iconAnchor: [0, 0],
+      iconSize: null
+    });
+    L.marker([ev.lat, ev.lng], { icon })
+      .bindPopup(`<b>${ev.date}</b><br>${ev.label}`)
+      .addTo(map);
+
+    L.circleMarker([ev.lat, ev.lng], {
+      radius: 5, fillColor: ev.color, color: '#fff', weight: 1.5, fillOpacity: 1
+    }).addTo(map);
+  });
+
+  // ── fit bounds ────────────────────────────────────────────────────────────
+  map.fitBounds(points.map(p => [p.lat, p.lng]), { padding: [30, 30] });
+
+})();
+</script>
 
 </body>
 </html>

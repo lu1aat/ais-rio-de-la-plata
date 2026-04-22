@@ -4,11 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIS Rio de la Plata</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Courier New', monospace;
+      font-family: 'Inter', system-ui, sans-serif;
       background: #0a0f1e;
       color: #c8d8f0;
       min-height: 100vh;
@@ -26,25 +29,27 @@
 
     .site-title h1 {
       font-size: 1.4rem;
-      font-weight: bold;
+      font-weight: 700;
       color: #7dd3fc;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.01em;
     }
 
     .site-title p {
       font-size: 0.8rem;
       color: #4a7a9b;
       margin-top: 0.2rem;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.04em;
     }
 
     main {
-      max-width: 860px;
       margin: 3rem auto;
       padding: 0 2rem;
     }
 
     .section-label {
-      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
       letter-spacing: 0.15em;
       color: #4a7a9b;
       text-transform: uppercase;
@@ -75,28 +80,81 @@
     .post-card:hover { background: #112240; }
 
     .post-num {
-      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
       color: #4a7a9b;
       min-width: 2.5rem;
+      flex-shrink: 0;
     }
 
     .post-title {
       color: #7dd3fc;
       font-size: 1rem;
-      font-weight: bold;
+      font-weight: 600;
     }
 
     .post-desc {
       color: #6b8fa8;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       margin-top: 0.2rem;
+    }
+
+    .post-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #3a6080;
+      margin-top: 0.2rem;
+    }
+
+    .post-pills {
+      display: flex;
+      gap: 0.35rem;
+      margin-top: 0.55rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.07em;
+      padding: 0.22em 0.65em;
+      border-radius: 3px;
+      transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .pill-data {
+      border: 1px solid rgba(243, 156, 18, 0.25);
+      color: rgba(243, 156, 18, 0.55);
+      background: rgba(243, 156, 18, 0.04);
+    }
+
+    .pill-map {
+      border: 1px solid rgba(125, 211, 252, 0.2);
+      color: rgba(125, 211, 252, 0.5);
+      background: rgba(125, 211, 252, 0.04);
+    }
+
+    .post-card:hover .pill-data {
+      border-color: rgba(243, 156, 18, 0.5);
+      color: rgba(243, 156, 18, 0.85);
+      background: rgba(243, 156, 18, 0.07);
+      box-shadow: 0 0 10px rgba(243, 156, 18, 0.08);
+    }
+
+    .post-card:hover .pill-map {
+      border-color: rgba(125, 211, 252, 0.45);
+      color: rgba(125, 211, 252, 0.85);
+      background: rgba(125, 211, 252, 0.07);
+      box-shadow: 0 0 10px rgba(125, 211, 252, 0.08);
     }
 
     footer {
       text-align: center;
       padding: 3rem 2rem;
       color: #2a4a6a;
-      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
     }
 
     footer a { color: #4a7a9b; text-decoration: none; }
@@ -106,7 +164,7 @@
 <body>
 
 <header>
-  <div class="logo">🛳️⚓📡</div>
+  <div class="logo">⚓📡</div>
   <div class="site-title">
     <h1>AIS · Rio de la Plata</h1>
     <p>Actividad maritima · Datos y analisis</p>
@@ -122,8 +180,12 @@
     <a class="post-card" href="posts/01-sw-empress/">
       <span class="post-num">#1</span>
       <div>
-        <div class="post-title">SW EMPRESS</div>
-        <div class="post-desc"></div>
+        <div class="post-title">SW EMPRESS: Prospección Sísmica en la Plataforma Continental Uruguaya</div>
+        <div class="post-date">17 de abril de 2026</div>
+        <div class="post-pills">
+          <span class="pill pill-data">📄 datos:posiciones</span>
+          <span class="pill pill-map">🗺 mapa</span>
+        </div>
       </div>
     </a>
 
