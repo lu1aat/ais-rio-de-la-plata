@@ -47,6 +47,7 @@
     main {
       margin: 3.5rem auto;
       padding: 0 2rem;
+      max-width: 90%;
     }
 
     .post-meta {
@@ -211,7 +212,7 @@
     /* ── map ─────────────────────────────────────────── */
     #track-map {
       width: 100%;
-      height: 480px;
+      height: 600px;
       margin: 1.5rem 0;
       border: 1px solid #1e3a5f;
       background: #0a1525;
@@ -403,6 +404,72 @@
 
     footer a { color: #4a7a9b; text-decoration: none; }
     footer a:hover { color: #7dd3fc; }
+
+    /* ── table of contents ───────────────────────────── */
+    .toc {
+      border: 1px solid #1e3a5f;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 2.5rem;
+      display: inline-block;
+      min-width: 220px;
+    }
+
+    .toc-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #4a7a9b;
+      margin-bottom: 0.6rem;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-section;
+      margin: 0;
+      padding: 0;
+    }
+
+    .toc > ol > li {
+      counter-increment: toc-section;
+      margin-bottom: 0.25rem;
+    }
+
+    .toc > ol > li > a::before {
+      content: counter(toc-section) '. ';
+      font-family: 'JetBrains Mono', monospace;
+      color: #4a7a9b;
+      font-size: 0.78rem;
+    }
+
+    .toc a {
+      font-size: 0.82rem;
+      color: #a8c0d8;
+      text-decoration: none;
+    }
+    .toc a:hover { color: #7dd3fc; text-decoration: none; }
+
+    .toc .toc-sub {
+      list-style: none;
+      padding-left: 1.1rem;
+      margin-top: 0.15rem;
+    }
+
+    .toc .toc-sub li {
+      margin-bottom: 0.15rem;
+    }
+
+    .toc .toc-sub a::before {
+      content: '· ';
+      font-family: 'JetBrains Mono', monospace;
+      color: #2a4a6a;
+    }
+
+    .toc .toc-sub a {
+      font-size: 0.78rem;
+      color: #4a7a9b;
+    }
+    .toc .toc-sub a:hover { color: #7dd3fc; }
   </style>
 </head>
 <body>
@@ -422,21 +489,10 @@
 
   <div class="intro">
     <p>Acusan de hacer exploración sísmica en la zona económica exclusiva (ZEE) de Uruguay 🇺🇾 al buque de bandera noruega 🇳🇴 <strong>SW Empress</strong>.</p>
-    <ul class="news-links">
-      <li>
-        <a href="https://www.uypress.net/Secciones/Cruzan-responsabilidades-Cancilleria-Ambiente-y-Ancap-por-buque-noruego-que-realizo-prospeccion-sin-autorizacion-uc152112" target="_blank" rel="noopener noreferrer">Cruzan responsabilidades Cancillería, Ambiente y Ancap por buque noruego que realizó prospección sin autorización</a>
-        <span class="source">— Uypress</span>
-      </li>
-      <li>
-        <a href="https://www.lr21.com.uy/ecologia/1494166-buque-noruego-hizo-exploracion-sismica-sin-permiso-en-uruguay-esta-en-el-puerto-de-montevideo" target="_blank" rel="noopener noreferrer">Buque noruego hizo exploración sísmica sin permiso en Uruguay: está en el Puerto de Montevideo</a>
-        <span class="source">— La Red 21</span>
-      </li>
-    </ul>
-    <p>ANCAP menciona que operarían en "aguas internacionales", pero el Gobierno reclama soberanía hasta las 350 millas.</p>
   </div>
 
   <!-- ── Reconstrucción AIS ────────────────────────── -->
-  <h2>Reconstrucción del viaje desde datos AIS</h2>
+  <h2 id="reconstruccion">Reconstrucción del viaje desde datos AIS</h2>
 
   <p>Los datos del Sistema de Identificación Automática (AIS) permiten reconstruir el recorrido del buque entre el 2 y el 14 de abril de 2026.</p>
 
@@ -480,10 +536,12 @@
     <div class="map-legend-item"><div class="map-legend-swatch" style="background:#f39c12"></div>4–8 kn</div>
     <div class="map-legend-item"><div class="map-legend-swatch" style="background:#e74c3c"></div>1–4 kn</div>
     <div class="map-legend-item"><div class="map-legend-swatch" style="background:#555"></div>&lt; 1 kn — fondeado</div>
+    <div class="map-legend-item"><div class="map-legend-swatch" style="background:none;border-top:2px dashed #4fc3f7;height:0;margin-top:1.5px"></div>ZEE 200 mn</div>
+    <div class="map-legend-item"><div class="map-legend-swatch" style="background:none;border-top:2px dashed #f39c12;height:0;margin-top:1.5px"></div>Plataforma 350 mn</div>
   </div>
 
   <!-- ── Inicio de trabajos ────────────────────────── -->
-  <h3>Inicio de trabajos: cambio de estado a "Restricted Manoeuvrability"</h3>
+  <h3 id="inicio-trabajos">Inicio de trabajos: cambio de estado a "Restricted Manoeuvrability"</h3>
 
   <p>El <strong>3 de abril</strong>, el buque cambia su estado AIS de <em>Underway using Engine</em> a <em>Restricted Manoeuvrability</em> en las coordenadas <code>36°36'S, 50°30'W</code>.</p>
 
@@ -492,16 +550,16 @@
   <p>Este cambio de estado es consistente con el inicio de operaciones sísmicas activas, aunque no es posible confirmarlo con certeza solo a partir del AIS. La posición registrada en ese momento queda <strong>fuera de las 200 millas náuticas</strong> de la ZEE uruguaya.</p>
 
   <!-- ── Zona de trabajo ───────────────────────────── -->
-  <h3>Zona de trabajo</h3>
+  <h3 id="zona-trabajo">Zona de trabajo</h3>
 
   <p>Durante aproximadamente <strong>diez días</strong> (3 al 13 de abril), el SW Empress mantuvo estado <em>Restricted Manoeuvrability</em> navegando a velocidades bajas (2–4 nudos). Este patrón —velocidad reducida, rumbos paralelos, posición sostenida— es compatible con operaciones de adquisición sísmica, aunque el AIS por sí solo no permite confirmar qué actividad específica se realizaba.</p>
 
   <p>Según las coordenadas registradas, el área de operación se encontraría en el rango aproximado de <strong>270 a 320 millas náuticas</strong> desde las líneas de base uruguayas — dentro de la <strong>zona en disputa</strong> entre el límite de las 200 mn (ZEE) y el de las 350 mn (plataforma continental extendida reconocida por la ONU en 2016).</p>
 
   <!-- ── El barco ─────────────────────────────────── -->
-  <h2>El barco</h2>
+  <h2 id="el-barco">El barco</h2>
 
-  <h3>El SW EMPRESS: buque de prospeccion sismica</h3>
+  <h3 id="sw-empress">El SW EMPRESS: buque de prospeccion sismica</h3>
   <div class="clearfix">
     <div class="img-block float-right">
       <img src="sw_empress.png" alt="SW EMPRESS">
@@ -512,7 +570,7 @@
   </div>
 
   <!-- ── OCEAN DEE ──────────────────────────────────── -->
-  <h3>El OCEAN DEE: buque de apoyo sísmico</h3>
+  <h3 id="ocean-dee">El OCEAN DEE: buque de apoyo sísmico</h3>
 
   <div class="clearfix">
     <div class="img-block float-right">
@@ -526,21 +584,19 @@
   </div>
 
   <!-- ── Ingreso ZEE ───────────────────────────────── -->
-  <h3>Ingreso a la ZEE de 200 mn y fin de trabajos</h3>
+  <h3 id="ingreso-zee">Ingreso a la ZEE de 200 mn y fin de trabajos</h3>
 
   <p>El <strong>13 de abril</strong>, el SW Empress <strong>entra a la Zona Económica Exclusiva de Uruguay</strong> (200 mn) en las coordenadas <code>37°43'S, 52°30'W</code>, rumbo norte. En ese momento todavía registra estado <em>Restricted Manoeuvrability</em> y velocidad de 3–4 nudos — lo que podría indicar que las operaciones continuaban ya dentro de la ZEE convencional.</p>
 
   <p>Horas más tarde, cambia su estado AIS de <em>Restricted Manoeuvrability</em> a <em>Underway using Engine</em> en las coordenadas <code>36°57'S, 53°10'W</code>, y acelera a 13 nudos. El salto de velocidad sugiere el fin de las operaciones y el inicio del tránsito hacia Montevideo. En ese mismo momento, el destino AIS cambia de <code>OFFSHORE URUGUAY</code> a <code>MONTEVIDEO</code>.</p>
 
   <!-- ── Llegada ───────────────────────────────────── -->
-  <h3>Llegada a Montevideo</h3>
+  <h3 id="llegada">Llegada a Montevideo</h3>
 
   <p>El <strong>14 de abril</strong>, el SW Empress <strong>arriba al Puerto de Montevideo</strong>, asistido por los remolcadores VB Tero y VB Tannat. Permanece atracado en el puerto.</p>
 
-  <hr>
-
   <!-- ── Debate de límites ─────────────────────────── -->
-  <h2>El debate de límites: 200 mn vs 350 mn</h2>
+  <h2 id="debate-limites">El debate de límites: 200 mn vs 350 mn</h2>
 
   <p>El núcleo del conflicto es una disputa sobre qué norma aplica en la zona donde operó el buque.</p>
 
@@ -557,10 +613,8 @@
 
   <p>Según los datos AIS, el área principal de trabajo del SW Empress se ubicaría <strong>fuera de las 200 mn</strong> pero <strong>dentro del límite de 350 mn</strong> reconocido por la ONU. Eso coloca las operaciones exactamente en el centro de la disputa jurídica.</p>
 
-  <hr>
-
   <!-- ── Mapas ─────────────────────────────────────── -->
-  <h2>Mapas</h2>
+  <h2 id="mapas">Mapas</h2>
 
   <div class="gallery">
     <div class="img-block">
@@ -579,7 +633,7 @@
   <hr>
 
   <!-- ── Conclusión ────────────────────────────────── -->
-  <h2>Conclusión técnica</h2>
+  <h2 id="conclusion">Conclusión técnica</h2>
 
   <div class="conclusion">
     <p>Lo que los datos AIS muestran de forma objetiva es que el SW Empress mantuvo estado <em>Restricted Manoeuvrability</em> durante aproximadamente diez días en una zona que, según el aval de la ONU de 2016, formaría parte de la plataforma continental sobre la que Uruguay reclama derechos soberanos.</p><p>La presencia del OCEAN DEE, un buque de apoyo sísmico, sugiere que no se trató de un tránsito casual sino de una operación planificada.</p>
@@ -588,8 +642,17 @@
   </div>
 
   <div class="post-footer">
-    <p>Datos: [<a href="positions.csv">positions.csv</a>] MarineTraffic AIS Export — SW EMPRESS, abril 2026. </p>
-    <p>Fuentes: Uypress, La Red 21</p>
+    <p>Datos: [<a href="positions.csv">positions.csv</a>] MarineTraffic AIS Export — SW EMPRESS, abril 2026 · Límites: <a href="https://marineregions.org/gazetteer.php?p=details&id=8467" target="_blank" rel="noopener noreferrer">ZEE MRGID:8467</a>, <a href="https://marineregions.org/gazetteer.php?p=details&id=63038" target="_blank" rel="noopener noreferrer">Plataforma MRGID:63038</a> — Marine Regions</p>
+    <p>Fuentes:    <ul class="news-links">
+      <li>
+        <a href="https://www.uypress.net/Secciones/Cruzan-responsabilidades-Cancilleria-Ambiente-y-Ancap-por-buque-noruego-que-realizo-prospeccion-sin-autorizacion-uc152112" target="_blank" rel="noopener noreferrer">Cruzan responsabilidades Cancillería, Ambiente y Ancap por buque noruego que realizó prospección sin autorización</a>
+        <span class="source">— Uypress</span>
+      </li>
+      <li>
+        <a href="https://www.lr21.com.uy/ecologia/1494166-buque-noruego-hizo-exploracion-sismica-sin-permiso-en-uruguay-esta-en-el-puerto-de-montevideo" target="_blank" rel="noopener noreferrer">Buque noruego hizo exploración sísmica sin permiso en Uruguay: está en el Puerto de Montevideo</a>
+        <span class="source">— La Red 21</span>
+      </li>
+    </ul></p>
     <p>Análisis: LU1AAT / CX9CAT — <a href="https://lu1aat.github.io/ais-rio-de-la-plata/" target="_blank" rel="noopener noreferrer">AIS Rio de la Plata</a></p>
   </div>
 
@@ -630,6 +693,26 @@
   L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
     maxZoom: 19, opacity: 0.45
   }).addTo(map);
+
+  // ── Plataforma continental extendida 350 mn ───────────────────────────────
+  try {
+    const ecsData = await fetch('uruguay_ecs_350nm.geojson').then(r => r.json());
+    L.geoJSON(ecsData, {
+      style: { color: '#f39c12', weight: 1.5, opacity: 0.6, fill: true, fillColor: '#f39c12', fillOpacity: 0.04, dashArray: '3 5' }
+    }).bindTooltip('Plataforma Continental Extendida — 350 mn', { sticky: true, className: 'pt-tooltip' }).addTo(map);
+  } catch (e) {
+    console.warn('Could not load ECS layer', e);
+  }
+
+  // ── ZEE 200 mn ───────────────────────────────────────────────────────────
+  try {
+    const eezData = await fetch('uruguay_eez_200nm.geojson').then(r => r.json());
+    L.geoJSON(eezData, {
+      style: { color: '#4fc3f7', weight: 1.5, opacity: 0.7, fill: true, fillColor: '#4fc3f7', fillOpacity: 0.04, dashArray: '6 4' }
+    }).bindTooltip('ZEE Uruguay — 200 mn', { sticky: true, className: 'pt-tooltip' }).addTo(map);
+  } catch (e) {
+    console.warn('Could not load EEZ layer', e);
+  }
 
   // ── load and parse CSV ────────────────────────────────────────────────────
   let csvText;
