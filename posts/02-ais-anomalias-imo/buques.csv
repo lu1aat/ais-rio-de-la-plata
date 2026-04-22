@@ -1,0 +1,16 @@
+nombre,imo_en_ais,imo_real,bandera,categoria,observacion
+CACIQUE,876,,UY,imo_corto,3 digitos
+NONI II,7941,,UY,imo_corto,4 digitos - coincide con matricula
+ANCAP SEPTIMO,7770,,UY,imo_corto,4 digitos - coincide con matricula
+TRITON,739399,,UY,imo_corto,6 digitos
+LOITADOR,851200,8512700,ES,imo_corto_adulterado,6 digitos - falta el digito 7
+109 EUN HAE,860970,8609670,KR,imo_corto_cero,6 digitos - falta cero en posicion 5
+ANTARES I,123456,,UY,imo_default,valor de relleno
+VILLALONGA,123456789,,UY,imo_default,valor de relleno
+PROMOPES I,123456789,,UY,imo_default,valor de relleno
+ARA CDAD ZARATE,1000000,,AR,imo_default,valor de relleno
+SANTA MARINA,8619875,8619675,ES,imo_adulterado,digito 8 en lugar de 6 en posicion 4
+NORDICO,933665800,9336658,PA,imo_cero_extra,cero sobrante al final
+PROTEAS,928845900,9288459,PA,imo_cero_extra,cero sobrante al final
+ALTAR 11,890408200,8904082,EC,imo_cero_extra,cero sobrante al final
+SAE IN LEADER,85059770,8505977,KR,imo_cero_extra,cero sobrante al final

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anomalías de IMO en datos AIS — AIS Rio de la Plata</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0f1e;
+      color: #c8d8f0;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+    header {
+      border-bottom: 1px solid #1e3a5f;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .logo { font-size: 1.4rem; line-height: 1; text-decoration: none; }
+
+    .site-title a {
+      font-size: 0.85rem;
+      color: #4a7a9b;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    .site-title a:hover { color: #7dd3fc; }
+
+    main {
+      margin: 3.5rem auto;
+      padding: 0 2rem;
+      max-width: 800px;
+    }
+
+    .post-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: #4a7a9b;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 2.5rem;
+      color: #e8f4ff;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .post-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #4a7a9b;
+      margin-bottom: 2rem;
+      letter-spacing: 0.06em;
+    }
+
+    .intro p {
+      font-size: 0.95rem;
+      color: #a8c0d8;
+      margin-bottom: 0.5rem;
+    }
+    .intro p:last-child { margin-bottom: 0; }
+
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      color: #7dd3fc;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 3rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    h3 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 1rem;
+      color: #a8c8e8;
+      font-weight: 600;
+      margin: 2rem 0 0.65rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #b8cfe8;
+      margin-bottom: 1rem;
+    }
+
+    strong { color: #e8f4ff; font-weight: 600; }
+
+    em {
+      font-family: 'JetBrains Mono', monospace;
+      font-style: normal;
+      font-size: 0.88em;
+      color: #7dd3fc;
+      background: #0d1a2e;
+      border: 1px solid #1a3050;
+      padding: 0.05em 0.35em;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #0d1a2e;
+      border: 1px solid #1e3a5f;
+      padding: 0.1em 0.4em;
+      font-size: 0.83em;
+      color: #7dd3fc;
+    }
+
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── callout box ─────────────────────────────────── */
+    .callout {
+      border-left: 3px solid #1e3a5f;
+      background: #0d1a2e;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .callout p {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      color: #a0b8d0;
+    }
+
+    /* ── table ───────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      background: #0d1a2e;
+      color: #4a7a9b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #0f1e35;
+      vertical-align: top;
+      line-height: 1.55;
+      color: #b8cfe8;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #7dd3fc;
+      white-space: nowrap;
+      font-size: 0.82rem;
+    }
+
+    td .flag { font-size: 1em; }
+
+    .imo-bad  { color: #e74c3c; }
+    .imo-good { color: #2ecc71; }
+    .imo-note { color: #6b8fa8; font-size: 0.8rem; display: block; margin-top: 0.2rem; }
+
+    /* ── images ──────────────────────────────────────── */
+    .img-block { margin: 1.5rem 0; }
+
+    .img-block.half-right {
+      float: right;
+      width: 50%;
+      margin: 0 0 1.5rem 2rem;
+    }
+
+    .clearfix::after { content: ''; display: table; clear: both; }
+
+    .img-block img {
+      width: 100%;
+      display: block;
+      border: 1px solid #1e3a5f;
+    }
+
+    .img-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #4a7a9b;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    .gallery {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+    .gallery-2 { grid-template-columns: repeat(2, 1fr); }
+    .gallery-3 { grid-template-columns: repeat(3, 1fr); }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1e3a5f;
+      margin: 2.5rem 0;
+    }
+
+    /* ── toc ─────────────────────────────────────────── */
+    .toc {
+      border: 1px solid #1e3a5f;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 2.5rem;
+      display: inline-block;
+      min-width: 220px;
+    }
+
+    .toc-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #4a7a9b;
+      margin-bottom: 0.6rem;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-section;
+      margin: 0;
+      padding: 0;
+    }
+
+    .toc > ol > li {
+      counter-increment: toc-section;
+      margin-bottom: 0.25rem;
+    }
+
+    .toc > ol > li > a::before {
+      content: counter(toc-section) '. ';
+      font-family: 'JetBrains Mono', monospace;
+      color: #4a7a9b;
+      font-size: 0.78rem;
+    }
+
+    .toc a {
+      font-size: 0.82rem;
+      color: #a8c0d8;
+      text-decoration: none;
+    }
+    .toc a:hover { color: #7dd3fc; text-decoration: none; }
+
+    /* ── post footer ─────────────────────────────────── */
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1e3a5f;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #4a7a9b;
+      line-height: 2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #2a4a6a;
+      font-size: 0.72rem;
+    }
+
+    footer a { color: #4a7a9b; text-decoration: none; }
+    footer a:hover { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../">⚓📡</a>
+  <div class="site-title">
+    <a href="../../">AIS · Rio de la Plata</a>
+  </div>
+</header>
+
+<main>
+
+  <p class="post-meta">Publicación #02</p>
+  <h1>Anomalías de IMO en datos AIS del Río de la Plata</h1>
+  <p class="post-date">10 de abril de 2026</p>
+
+  <div class="toc">
+    <p class="toc-title">Índice</p>
+    <ol>
+      <li><a href="#que-es-imo">¿Qué es el IMO?</a></li>
+      <li><a href="#imo-cortos">IMO demasiado cortos</a></li>
+      <li><a href="#imo-default">IMO "default" o artificiales</a></li>
+      <li><a href="#imo-adulterados">IMO adulterados</a></li>
+      <li><a href="#imo-ceros">Ceros de más o de menos</a></li>
+      <li><a href="#conclusion">Conclusión</a></li>
+      <li><a href="#datos">Datos</a></li>
+    </ol>
+  </div>
+
+  <div class="intro">
+    <p>Al analizar los datos AIS capturados en el Río de la Plata aparecen buques cuyo número IMO no cumple con el estándar internacional. El IMO es el identificador de trazabilidad global de los buques: si está adulterado, el buque puede operar sin dejar rastro verificable.</p>
+  </div>
+
+  <!-- ── Descarga de datos ────────────────────────── -->
+  <div class="callout">
+    <p>📄 <strong>Datos:</strong> la tabla completa de buques con anomalías de IMO documentados en este artículo está disponible para descargar: <a href="buques.csv">buques.csv</a> — 15 registros con nombre, IMO en AIS, IMO real, bandera y categoría de anomalía.</p>
+  </div>
+
+  <!-- ── ¿Qué es el IMO? ───────────────────────────── -->
+  <h2 id="que-es-imo">¿Qué es el número IMO?</h2>
+
+  <div class="clearfix">
+    <div class="img-block half-right">
+      <img src="tweet1.jpg" alt="Ejemplo de cálculo del checksum IMO">
+      <p class="img-caption">Validación del checksum IMO</p>
+    </div>
+
+    <p>El número IMO es un identificador único de <strong>7 dígitos</strong> asignado por la Organización Marítima Internacional a cada buque, y lo acompaña de por vida independientemente de cambios de nombre, bandera o propietario. Es la base de la trazabilidad marítima global.</p>
+
+    <p>No basta con tener 7 dígitos: el IMO incluye un <strong>dígito de control</strong> (checksum) que permite validar matemáticamente si el número es legítimo. Los primeros 6 dígitos se multiplican por los pesos 7, 6, 5, 4, 3 y 2 respectivamente; la suma debe ser congruente con el séptimo dígito.</p>
+
+    <p>En los datos AIS del Río de la Plata aparecen valores que no cumplen ni con el formato ni con el checksum. A continuación se clasifican los distintos tipos de anomalía encontrados.</p>
+  </div>
+
+  <!-- ── IMO cortos ─────────────────────────────────── -->
+  <h2 id="imo-cortos">IMO demasiado cortos</h2>
+
+  <p>El primer tipo de anomalía son números con <strong>menos de 7 dígitos</strong>. En algunos casos coinciden con el número de matrícula local del buque, lo que sugiere que se ingresó ese dato en el campo IMO por error o de forma intencional.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>IMO en AIS</th>
+        <th>Buque</th>
+        <th>Observación</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="imo-bad">876</span></td>
+        <td>CACIQUE 🇺🇾</td>
+        <td>3 dígitos</td>
+      </tr>
+      <tr>
+        <td><span class="imo-bad">7941</span></td>
+        <td>NONI II 🇺🇾</td>
+        <td>4 dígitos — coincide con matrícula</td>
+      </tr>
+      <tr>
+        <td><span class="imo-bad">7770</span></td>
+        <td>ANCAP SEPTIMO 🇺🇾</td>
+        <td>4 dígitos — coincide con matrícula</td>
+      </tr>
+      <tr>
+        <td><span class="imo-bad">739399</span></td>
+        <td>TRITON 🇺🇾</td>
+        <td>6 dígitos</td>
+      </tr>
+      <tr>
+        <td><span class="imo-bad">851200</span></td>
+        <td>LOITADOR 🇪🇸</td>
+        <td>6 dígitos — ver también sección 4</td>
+      </tr>
+      <tr>
+        <td><span class="imo-bad">860970</span></td>
+        <td>109 EUN HAE 🇰🇷</td>
+        <td>6 dígitos — ver también sección 5</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="gallery gallery-2">
+    <div class="img-block">
+      <img src="tweet2a.jpg" alt="Captura AIS — IMO demasiado cortos, grupo 1">
+      <p class="img-caption">IMO cortos — ANCAP SEPTIMO, IMO coincide con matrícula</p>
+    </div>
+    <div class="img-block">
+      <img src="tweet2b.jpg" alt="Captura AIS — IMO demasiado cortos, grupo 2">
+      <p class="img-caption">IMO cortos — NONI II, IMO coincide con matrícula</p>
+    </div>
+  </div>
+
+  <!-- ── IMO default ────────────────────────────────── -->
+  <h2 id="imo-default">IMO "default" o artificiales</h2>
+
+  <p>El segundo tipo de anomalía son números que parecen <strong>valores de relleno</strong> introducidos para poder completar la configuración del equipo AIS sin contar con el dato real. Secuencias como <code>123456</code> o <code>1000000</code> no tienen ninguna asignación IMO válida.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>IMO en AIS</th>
+        <th>Buque</th>
+        <th>Bandera</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="imo-bad">123456</span></td>
+        <td>ANTARES I</td>
+        <td>🇺🇾 Uruguay</td>
+      </tr>
+      <tr>
+        <td><span class="imo-bad">123456789</span></td>
+        <td>VILLALONGA</td>
+        <td>🇺🇾 Uruguay</td>
+      </tr>
+      <tr>
+        <td><span class="imo-bad">123456789</span></td>
+        <td>PROMOPES I</td>
+        <td>🇺🇾 Uruguay</td>
+      </tr>
+      <tr>
+        <td><span class="imo-bad">1000000</span></td>
+        <td>ARA CDAD ZARATE</td>
+        <td>🇦🇷 Argentina</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p>Posibles causas: valor por defecto de fábrica, carga manual sin el dato disponible, o el equipo impide avanzar en la configuración sin ingresar algún número en ese campo.</p>
+  </div>
+
+  <div class="gallery gallery-2">
+    <div class="img-block">
+      <img src="tweet3a.jpg" alt="Captura AIS — IMO artificiales, ARA CDAD ZARATE">
+      <p class="img-caption">ARA CDAD ZARATE — IMO 1000000</p>
+    </div>
+    <div class="img-block">
+      <img src="tweet3b.jpg" alt="Captura AIS — IMO artificiales, PROMOPES I">
+      <p class="img-caption">PROMOPES I - IMO 123456789</p>
+    </div>
+  </div>
+
+  <!-- ── IMO adulterados ────────────────────────────── -->
+  <h2 id="imo-adulterados">IMO adulterados</h2>
+
+  <p>El tercer tipo son números que <strong>difieren en un dígito</strong> del IMO real del buque. Los pesqueros españoles <strong>LOITADOR</strong> y <strong>SANTA MARINA</strong> transmiten IMO que no superan el checksum; al contrastarlos con registros externos, se puede identificar el número correcto.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Buque</th>
+        <th>IMO en AIS</th>
+        <th>IMO real</th>
+        <th>Error</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>LOITADOR 🇪🇸</td>
+        <td><span class="imo-bad">851200</span></td>
+        <td><span class="imo-good">8512700</span></td>
+        <td>Falta el dígito <code>7</code></td>
+      </tr>
+      <tr>
+        <td>SANTA MARINA 🇪🇸</td>
+        <td><span class="imo-bad">8619875</span></td>
+        <td><span class="imo-good">8619675</span></td>
+        <td><code>8</code> en lugar de <code>6</code> en posición 4</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Al momento de publicar este análisis, el <strong>LOITADOR estaba entrando al puerto de Montevideo</strong>. El SANTA MARINA había estado en puerto MVD en febrero.</p>
+
+  <div class="gallery gallery-3">
+    <div class="img-block">
+      <img src="tweet4a.jpg" alt="LOITADOR — IMO adulterado en AIS">
+      <p class="img-caption">LOITADOR — IMO 851200 en AIS vs. 8512700 real</p>
+    </div>
+    <div class="img-block">
+      <img src="tweet4b.jpg" alt="SANTA MARINA — IMO adulterado en AIS">
+      <p class="img-caption">SANTA MARINA — IMO 8619875 en AIS vs. 8619675 real</p>
+    </div>
+    <div class="img-block">
+      <img src="tweet4c.jpg" alt="Intensidad de señal AIS — LOITADOR y SANTA MARINA">
+      <p class="img-caption">Intensidad de señal AIS — LOITADOR y SANTA MARINA</p>
+    </div>
+  </div>
+
+  <!-- ── Ceros extra ────────────────────────────────── -->
+  <h2 id="imo-ceros">Ceros de más o de menos</h2>
+
+  <p>El cuarto tipo de anomalía consiste en números reales con un <strong>cero adicional o faltante</strong>. El IMO correcto es identificable porque el número sin el cero supera el checksum; el transmitido en AIS no.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Buque</th>
+        <th>IMO en AIS</th>
+        <th>IMO real</th>
+        <th>Bandera</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>NORDICO</td>
+        <td><span class="imo-bad">933665800</span></td>
+        <td><span class="imo-good">9336658</span></td>
+        <td>🇵🇦 Panamá</td>
+      </tr>
+      <tr>
+        <td>PROTEAS</td>
+        <td><span class="imo-bad">928845900</span></td>
+        <td><span class="imo-good">9288459</span></td>
+        <td>🇵🇦 Panamá</td>
+      </tr>
+      <tr>
+        <td>ALTAR 11</td>
+        <td><span class="imo-bad">890408200</span></td>
+        <td><span class="imo-good">8904082</span></td>
+        <td>🇪🇨 Ecuador</td>
+      </tr>
+      <tr>
+        <td>SAE IN LEADER</td>
+        <td><span class="imo-bad">85059770</span></td>
+        <td><span class="imo-good">8505977</span></td>
+        <td>🇰🇷 Corea del Sur</td>
+      </tr>
+      <tr>
+        <td>109 EUN HAE</td>
+        <td><span class="imo-bad">860970</span></td>
+        <td><span class="imo-good">8609670</span></td>
+        <td>🇰🇷 Corea del Sur</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p>SAE IN LEADER y 109 EUN HAE son pesqueros coreanos que operan cerca de la Zona Económica Exclusiva argentina en el Atlántico Sur.</p>
+  </div>
+
+  <div class="gallery gallery-2">
+    <div class="img-block">
+      <img src="tweet5a.jpg" alt="Captura AIS — NORDICO, PROTEAS, ALTAR 11">
+      <p class="img-caption">PROTEAS — cero sobrante al final</p>
+    </div>
+    <div class="img-block">
+      <img src="tweet5b.jpg" alt="Captura AIS — SAE IN LEADER y 109 EUN HAE">
+      <p class="img-caption"> Pesquero Coreano 109 EUN HAE — cero faltante al final</p>
+    </div>
+  </div>
+
+  <h2 id="conclusion">Conclusión</h2>
+
+  <p>Los datos AIS capturados en el Río de la Plata muestran <strong>cuatro categorías distintas</strong> de irregularidades en el número IMO: números demasiado cortos (a veces iguales a la matrícula local), valores artificiales de relleno, dígitos modificados, y ceros sobrantes o faltantes.</p>
+
+  <p>En los casos más preocupantes —como LOITADOR y SANTA MARINA— el error es de un solo dígito en un IMO que de otro modo tendría aspecto legítimo, lo que dificulta la detección automática. Un buque con IMO incorrecto no puede ser identificado de forma confiable en bases de datos internacionales, lo que compromete la trazabilidad y el control de las actividades pesqueras.</p>
+
+  <!-- ── Datos ─────────────────────────────────────── -->
+  <h2 id="datos">Datos</h2>
+
+  <table>
+    <thead>
+      <tr><th>Recurso</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="buques.csv">buques.csv</a></td>
+        <td>Tabla completa — 15 buques con IMO anómalo: nombre, IMO en AIS, IMO real, bandera y categoría</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2042636351770677530" target="_blank" rel="noopener noreferrer">Tweet #1</a></td>
+        <td>Introducción — el IMO y su checksum. IMO con anomalías en datos AIS del Río de la Plata</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2042637965487141024" target="_blank" rel="noopener noreferrer">Tweet #2</a></td>
+        <td>IMO demasiado cortos — CACIQUE, NONI II, ANCAP SEPTIMO, TRITON, LOITADOR, 109 EUN HAE</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2042641595443331314" target="_blank" rel="noopener noreferrer">Tweet #3</a></td>
+        <td>IMO "default" o artificiales — ANTARES I, VILLALONGA, PROMOPES I, ARA CDAD ZARATE</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2042649252711526522" target="_blank" rel="noopener noreferrer">Tweet #4</a></td>
+        <td>IMO adulterados — LOITADOR y SANTA MARINA, pesqueros españoles en puerto MVD</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2042726120043249885" target="_blank" rel="noopener noreferrer">Tweet #5</a></td>
+        <td>Ceros de más o de menos — NORDICO, PROTEAS, ALTAR 11, SAE IN LEADER, 109 EUN HAE</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="post-footer">
+    <p>Análisis: LU1AAT / CX9CAT — <a href="https://lu1aat.github.io/ais-rio-de-la-plata/" target="_blank" rel="noopener noreferrer">AIS Rio de la Plata</a></p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="../../">← Volver al inicio</a>
+</footer>
+
+</body>
+</html>
