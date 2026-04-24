@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIS como indicador de propagación VHF — AIS Rio de la Plata</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0f1e;
+      color: #c8d8f0;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    header {
+      border-bottom: 1px solid #1e3a5f;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .logo { font-size: 1.4rem; line-height: 1; text-decoration: none; }
+
+    .site-title a {
+      font-size: 0.85rem;
+      color: #4a7a9b;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    .site-title a:hover { color: #7dd3fc; }
+
+    main {
+      margin: 3.5rem auto;
+      padding: 0 2rem;
+      max-width: 70%;
+    }
+
+    .post-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: #4a7a9b;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 2.2rem;
+      color: #e8f4ff;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .post-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #4a7a9b;
+      margin-bottom: 1.75rem;
+      letter-spacing: 0.06em;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #b8cfe8;
+      margin-bottom: 1rem;
+    }
+
+    strong { color: #e8f4ff; font-weight: 600; }
+
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #2a4a6a;
+      flex-shrink: 0;
+      transition: background 0.4s;
+    }
+
+    .status-sep { color: #1e3a5f; }
+
+    /* ── map ──────────────────────────────────────────── */
+    #map {
+      width: 100%;
+      height: 460px;
+      border: 1px solid #1e3a5f;
+      margin-bottom: 0.6rem;
+    }
+
+    .leaflet-container { background: #060c18; }
+
+    .leaflet-tooltip.map-tip {
+      background: #0d1a2e;
+      border: 1px solid #1e3a5f;
+      color: #c8d8f0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.3rem 0.55rem;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .leaflet-tooltip.map-tip::before { border: none; }
+
+    #map:-webkit-full-screen { height: 100vh !important; }
+    #map:fullscreen           { height: 100vh !important; }
+    .leaflet-bar a svg        { vertical-align: middle; }
+
+    /* ── map meta row (legend + status) ──────────────── */
+    .map-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+      margin-bottom: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: #4a7a9b;
+    }
+
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+
+    .map-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.06em;
+    }
+
+    .legend-swatch { width: 22px; height: 2px; flex-shrink: 0; }
+
+    /* ── station grid ─────────────────────────────────── */
+    .station-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .station-card {
+      border: 1px solid #1e3a5f;
+      background: #0d1a2e;
+      padding: 1.1rem 1.1rem 1.1rem 1.4rem;
+      position: relative;
+    }
+
+    .station-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      transition: background 0.4s;
+    }
+
+    .station-card.status-unknown::before { background: #2a4a6a; }
+    .station-card.status-ok::before      { background: #2ecc71; }
+    .station-card.status-nok::before     { background: #e74c3c; }
+
+    .card-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.15em 0.45em;
+      border: 1px solid;
+      margin-bottom: 0.55rem;
+      transition: color 0.4s, border-color 0.4s;
+    }
+
+    .badge-unknown  { color: #4a7a9b; border-color: #1e3a5f; }
+    .badge-ok       { color: #2ecc71; border-color: rgba(46,204,113,.35); }
+    .badge-nok      { color: #e74c3c; border-color: rgba(231,76,60,.35); }
+    .badge-furthest { color: #7dd3fc; border-color: rgba(125,211,252,.3); }
+
+    /* furthest vessel card overrides the green ok border */
+    #furthest-card.status-ok::before      { background: #7dd3fc; }
+    #furthest-card.status-unknown::before { background: #2a4a6a; }
+
+    .card-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e8f4ff;
+      margin-bottom: 0.15rem;
+    }
+
+    .card-mmsi {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #4a7a9b;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.9rem;
+    }
+
+    .card-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 0.75rem;
+    }
+
+    .metric-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #4a7a9b;
+      margin-bottom: 0.1rem;
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #7dd3fc;
+      transition: color 0.3s;
+    }
+
+    .metric-value.no-data { color: #2a4a6a; }
+
+    /* ── signal sparkline ────────────────────────────── */
+    .spark-wrap {
+      margin-top: 0.75rem;
+      border-top: 1px solid #0f1e35;
+      padding-top: 0.5rem;
+    }
+    .sparkline { width: 100%; height: 28px; display: block; }
+
+    /* ── intro table ──────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0 0;
+      font-size: 0.88rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.45rem 0.75rem;
+      background: #060c18;
+      color: #4a7a9b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1e3a5f;
+    }
+    td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid #0f1e35;
+      color: #b8cfe8;
+      vertical-align: middle;
+      line-height: 1.5;
+    }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; white-space: nowrap; }
+    td.score-key { color: #2ecc71; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+
+    /* ── propagation panel ────────────────────────────── */
+    .prop-panel {
+      border: 1px solid #1e3a5f;
+      background: #0d1a2e;
+      padding: 1.25rem 1.5rem 1rem;
+      margin: 1.75rem 0 0;
+      transition: border-color 0.5s;
+    }
+    .prop-panel.status-ok  { border-color: rgba(46, 204, 113, 0.45); }
+    .prop-panel.status-nok { border-color: rgba(231, 76, 60, 0.35); }
+
+    .prop-heading {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #4a7a9b;
+      margin-bottom: 0.9rem;
+    }
+
+    .prop-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .prop-score-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 0.45rem;
+    }
+
+    .prop-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3.2rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #2a4a6a;
+      transition: color 0.4s;
+    }
+
+    .prop-max {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #2a4a6a;
+    }
+
+    .prop-status-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: #4a7a9b;
+    }
+
+    .prop-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #2a4a6a;
+      flex-shrink: 0;
+      transition: background 0.4s;
+    }
+
+    .prop-bar-track {
+      height: 3px;
+      background: #1e3a5f;
+      margin-top: 1rem;
+      position: relative;
+    }
+
+    .prop-bar-fill {
+      height: 100%;
+      background: #2a4a6a;
+      width: 0%;
+      transition: width 0.5s ease-out, background 0.4s;
+    }
+
+    .prop-bar-threshold {
+      position: absolute;
+      top: -4px;
+      width: 1px;
+      height: 11px;
+      background: #4a7a9b;
+    }
+
+    /* ── animated vessel link ────────────────────────── */
+    @keyframes link-flow {
+      to { stroke-dashoffset: -20; }
+    }
+    .link-animated {
+      animation: link-flow 0.9s linear infinite;
+    }
+
+    /* ── rx animations ────────────────────────────────── */
+    @keyframes rx-flash {
+      0%   { background: rgba(46, 204, 113, 0.12); border-color: rgba(46, 204, 113, 0.4); }
+      100% { background: #0d1a2e; border-color: #1e3a5f; }
+    }
+    .station-card.rx-active { animation: rx-flash 1.8s ease-out forwards; }
+
+    /* ── post footer ──────────────────────────────────── */
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1e3a5f;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #4a7a9b;
+      line-height: 2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #2a4a6a;
+      font-size: 0.72rem;
+    }
+    footer a { color: #4a7a9b; text-decoration: none; }
+    footer a:hover { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../">⚓📡</a>
+  <div class="site-title">
+    <a href="../../">AIS · Rio de la Plata</a>
+  </div>
+</header>
+
+<main>
+
+  <p class="post-meta">Publicación #03</p>
+  <h1>AIS como indicador de propagación VHF</h1>
+  <p class="post-date">23 de abril de 2026</p>
+
+  <p>AIS se transmite en VHF (161.975 y 162.025 MHz). Las estaciones fijas —faros, balizas— emiten de forma continua con potencia constante desde posiciones conocidas: si una que normalmente no se escucha aparece, las condiciones de propagación mejoraron y la señal viaja más lejos de lo habitual.</p>
+  <p>Esta página es un intento por monitorear ese fenómeno desde Buceo, Montevideo.</p>
+
+  <table>
+    <thead>
+      <tr><th>Estación</th><th>Dist.</th><th>Interpretación</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>🚢 DF19 Recalada</td>
+        <td>~26 km</td>
+        <td>Enlace de corto alcance — condiciones estándar</td>
+      </tr>
+      <tr>
+        <td>⚓ Faro Punta Piedras</td>
+        <td>~109 km</td>
+        <td class="score-key">Indicador principal — solo se recibe con propagación activa</td>
+      </tr>
+      <tr>
+        <td>🚢 Barco más lejano</td>
+        <td>variable</td>
+        <td>Refleja el alcance real del receptor en tiempo real</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="prop-panel" id="prop-panel">
+    <div class="prop-heading">Índice de propagación VHF</div>
+    <div class="prop-body">
+      <div class="prop-score-wrap">
+        <span class="prop-score" id="prop-score">0</span>
+        <span class="prop-max" id="prop-max">/ —</span>
+      </div>
+      <div class="prop-status-wrap">
+        <span class="prop-dot" id="prop-dot"></span>
+        <span id="prop-label">Sin datos</span>
+      </div>
+    </div>
+    <div class="prop-bar-track">
+      <div class="prop-bar-fill" id="prop-bar-fill"></div>
+      <div class="prop-bar-threshold" id="prop-bar-threshold"></div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="map-meta">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:#2ecc71"></div>
+      <span>recibido</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:repeating-linear-gradient(90deg,#2a4a6a 0 5px,transparent 5px 9px)"></div>
+      <span>sin datos</span>
+    </div>
+    <div class="map-status">
+      <span class="live-dot" id="live-dot"></span>
+      <span id="mqtt-status">Conectando…</span>
+      <span class="status-sep" id="last-msg-sep" style="display:none">·</span>
+      <span id="last-msg"></span>
+    </div>
+  </div>
+
+  <div class="station-grid" id="station-grid"></div>
+
+  <div class="post-footer">
+    <p>RX: LU1AAT / CX9CAT — BUCEO, Montevideo — <a href="../../">AIS Rio de la Plata</a></p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="../../">← Volver al inicio</a>
+</footer>
+
+<script>
+  // ── config ───────────────────────────────────────────────
+  const MQTT_URL        = 'wss://test.mosquitto.org:8081';
+  const MQTT_TOPIC      = 'ais-rio-de-la-plata/station/UYbuceo01';
+  let PTS_PER_KM        = 0.1;   // cargado desde stations.json → pts_per_km
+  const FURTHEST_RESET_MS = 5 * 60 * 1000; // reset del barco más lejano cada 5 min
+
+  // ── status config ────────────────────────────────────────
+  const STATUS_CFG = {
+    ok:      { color: '#2ecc71', label: 'recibido',    badge: 'badge-ok',      dash: null },
+    nok:     { color: '#e74c3c', label: 'no recibido', badge: 'badge-nok',     dash: null },
+    unknown: { color: '#2a4a6a', label: 'sin datos',   badge: 'badge-unknown', dash: '6 6' },
+  };
+
+  // ── state (keyed by mmsi string) ─────────────────────────
+  const stationData = {};   // mmsi → station object
+  const mapLayers   = {};   // mmsi → { line, marker }
+  const cardRefs    = {};   // mmsi → { card, badge, dbVal, lastVal }
+
+  let propThreshold = 50;
+  let propMaxScore  = 0;
+  let rxStation      = null;
+  let currentFurthest = null;
+
+
+  const SIGNAL_HISTORY = { furthest: [] };
+  const HISTORY_MAX    = 40;
+  const SPARK_DB_MIN   = -55;
+  const SPARK_DB_MAX   = -5;
+  let   furthestPrevMmsi = null;
+
+  // ── helpers ──────────────────────────────────────────────
+  function haversineKm(lat1, lng1, lat2, lng2) {
+    const R = 6371, r = d => d * Math.PI / 180;
+    const dLat = r(lat2 - lat1), dLng = r(lng2 - lng1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(r(lat1)) * Math.cos(r(lat2)) * Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return null;
+    return new Date(iso).toLocaleString('es-UY', {
+      timeZone: 'America/Montevideo',
+      day: '2-digit', month: 'short',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function fmtFull(iso) {
+    if (!iso) return null;
+    return new Date(iso).toLocaleString('sv', {
+      timeZone: 'America/Montevideo',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: false
+    });
+  }
+
+  // ── furthest vessel ──────────────────────────────────────
+  let furthestLayer; // initialized after map setup
+
+  function updateFurthestVessel(vessel) {
+    furthestLayer.clearLayers();
+    const card    = document.getElementById('furthest-card');
+    const nameEl  = document.getElementById('furthest-name');
+    const mmsiEl  = document.getElementById('furthest-mmsi');
+    const distEl  = document.getElementById('furthest-dist');
+    const dbEl    = document.getElementById('furthest-db');
+    const lastEl  = document.getElementById('furthest-last');
+    const scoreEl = document.getElementById('furthest-score');
+
+    if (!vessel) {
+      card.className     = 'station-card status-unknown';
+      nameEl.textContent = '—';
+      mmsiEl.textContent = '';
+      [distEl, dbEl, lastEl, scoreEl].forEach(el => {
+        if (el) { el.className = 'metric-value no-data'; el.textContent = '—'; el.style.color = ''; }
+      });
+      renderSparkline(document.getElementById('spark-furthest'), []);
+      return;
+    }
+
+    const lineColor = vessel.signalpower != null ? signalColor(vessel.signalpower) : '#7dd3fc';
+    const vesselScore = (vessel.distance * PTS_PER_KM).toFixed(1);
+    const label = vessel.name || `MMSI ${vessel.mmsi}`;
+
+    // map
+    const line = L.polyline([[rxStation.lat, rxStation.lng], [vessel.lat, vessel.lon]], {
+      color: lineColor, weight: 2, opacity: 0.75, dashArray: '12 8'
+    }).addTo(furthestLayer).bindTooltip(
+      `${label}<br>${vessel.distance.toFixed(0)} km`,
+      { sticky: true, className: 'map-tip' }
+    );
+    // animar la línea (SVG path)
+    const lineEl = line.getElement();
+    if (lineEl) lineEl.classList.add('link-animated');
+
+    L.circleMarker([vessel.lat, vessel.lon], {
+      radius: 5, fillColor: lineColor, color: lineColor, weight: 1.5, fillOpacity: 0.7
+    }).addTo(furthestLayer).bindTooltip(
+      `<b>${label}</b><br>${vessel.distance.toFixed(0)} km`,
+      { permanent: false, className: 'map-tip' }
+    );
+    pulseMarker(vessel.lat, vessel.lon, lineColor);
+
+    // card
+    card.className     = 'station-card status-ok';
+    nameEl.textContent = label;
+    mmsiEl.textContent = vessel.name ? `MMSI ${vessel.mmsi}` : '';
+    distEl.className   = 'metric-value'; distEl.textContent = `${vessel.distance.toFixed(0)} km`;
+    const dbStr = vessel.signalpower != null ? `${vessel.signalpower.toFixed(1)} dBm` : null;
+    dbEl.className   = dbStr ? 'metric-value' : 'metric-value no-data';
+    dbEl.style.color = dbStr ? lineColor : '';
+    dbEl.textContent = dbStr || '—';
+    lastEl.className = 'metric-value'; lastEl.textContent = timeAgo(vessel.rxtime);
+    if (scoreEl) { scoreEl.className = 'metric-value'; scoreEl.textContent = vesselScore; }
+
+    // signal history
+    if (vessel.mmsi !== furthestPrevMmsi) {
+      SIGNAL_HISTORY['furthest'] = [];
+      furthestPrevMmsi = vessel.mmsi;
+    }
+    if (vessel.signalpower != null) {
+      SIGNAL_HISTORY['furthest'].push(vessel.signalpower);
+      if (SIGNAL_HISTORY['furthest'].length > HISTORY_MAX) SIGNAL_HISTORY['furthest'].shift();
+    }
+    renderSparkline(document.getElementById('spark-furthest'), SIGNAL_HISTORY['furthest']);
+
+    card.classList.remove('rx-active');
+    void card.offsetWidth;
+    card.classList.add('rx-active');
+  }
+
+  function updateRecentVessels(msg, rxtime) {
+    const lat = msg.lat, lon = msg.lon; // AIS-catcher usa "lon", no "lng"
+    if (lat == null || lon == null) return;
+    if (lat === 0 && lon === 0) return;
+    if (lat > 90 || lat < -90 || lon > 180 || lon < -180) return;
+    if (stationData[String(msg.mmsi)]) return;
+
+    const dist = haversineKm(rxStation.lat, rxStation.lng, lat, lon);
+    if (!currentFurthest || dist > currentFurthest.distance) {
+      currentFurthest = {
+        mmsi:        msg.mmsi,
+        name:        msg.shipname || null,
+        lat, lon,
+        distance:    dist,
+        rxtime,
+        signalpower: msg.signalpower ?? null,
+      };
+      updateFurthestVessel(currentFurthest);
+    } else if (currentFurthest && String(currentFurthest.mmsi) === String(msg.mmsi) && msg.signalpower != null) {
+      // mismo barco escuchado de nuevo — acumula señal sin romper récord
+      SIGNAL_HISTORY['furthest'].push(msg.signalpower);
+      if (SIGNAL_HISTORY['furthest'].length > HISTORY_MAX) SIGNAL_HISTORY['furthest'].shift();
+      renderSparkline(document.getElementById('spark-furthest'), SIGNAL_HISTORY['furthest']);
+    }
+  }
+
+  // ── propagation panel ────────────────────────────────────
+  function updatePropPanel() {
+    const fixedScore  = Object.values(stationData)
+      .filter(s => s.status === 'ok')
+      .reduce((sum, s) => sum + (s.score || 0), 0);
+    const vesselScore = currentFurthest ? currentFurthest.distance * PTS_PER_KM : 0;
+    const score = fixedScore + vesselScore;
+
+    const hasData = Object.values(stationData).some(s => s.status === 'ok') || !!currentFurthest;
+    const hasProp = score >= propThreshold;
+    const pct     = propMaxScore > 0 ? Math.min((score / propMaxScore) * 100, 100) : 0;
+    const thrPct  = propMaxScore > 0 ? (propThreshold / propMaxScore) * 100 : 0;
+
+    document.getElementById('prop-score').textContent   = Math.floor(score);
+    document.getElementById('prop-bar-fill').style.width = `${pct}%`;
+    document.getElementById('prop-bar-threshold').style.left = `${thrPct}%`;
+
+    const panel  = document.getElementById('prop-panel');
+    const dot    = document.getElementById('prop-dot');
+    const label  = document.getElementById('prop-label');
+    const scoreEl = document.getElementById('prop-score');
+    const fill   = document.getElementById('prop-bar-fill');
+
+    if (!hasData) {
+      panel.className    = 'prop-panel';
+      dot.style.background = '#2a4a6a';
+      label.textContent  = 'Sin datos';
+      scoreEl.style.color = '#2a4a6a';
+      fill.style.background = '#2a4a6a';
+    } else if (hasProp) {
+      panel.className    = 'prop-panel status-ok';
+      dot.style.background = '#2ecc71';
+      label.textContent  = 'Propagación activa';
+      scoreEl.style.color = '#2ecc71';
+      fill.style.background = '#2ecc71';
+    } else {
+      panel.className    = 'prop-panel status-nok';
+      dot.style.background = '#e74c3c';
+      label.textContent  = 'Sin propagación';
+      scoreEl.style.color = '#e74c3c';
+      fill.style.background = '#e74c3c';
+    }
+  }
+
+  function signalColor(db) {
+    if (db > -20) return '#2ecc71';
+    if (db > -35) return '#f39c12';
+    return '#e74c3c';
+  }
+
+  function renderSparkline(svgEl, hist) {
+    if (!svgEl) return;
+    if (!hist || hist.length < 2) { svgEl.innerHTML = ''; return; }
+    const n = hist.length, W = 200, H = 28;
+    const clamp = v => Math.max(SPARK_DB_MIN, Math.min(SPARK_DB_MAX, v));
+    const pts = hist.map((v, i) => [
+      (i / (n - 1)) * W,
+      H - 2 - (clamp(v) - SPARK_DB_MIN) / (SPARK_DB_MAX - SPARK_DB_MIN) * (H - 4)
+    ]);
+    const color   = signalColor(hist[hist.length - 1]);
+    const lineStr = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+    const areaD   = `M${pts[0][0].toFixed(1)},${H}` +
+      pts.map(([x, y]) => ` L${x.toFixed(1)},${y.toFixed(1)}`).join('') +
+      ` L${pts[n-1][0].toFixed(1)},${H}Z`;
+    svgEl.innerHTML =
+      `<path d="${areaD}" fill="${color}" opacity="0.08"/>` +
+      `<polyline points="${lineStr}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+
+  function pulseMarker(lat, lng, color) {
+    const ring = L.circleMarker([lat, lng], {
+      radius: 8, color, weight: 2, fillOpacity: 0, opacity: 0.85
+    }).addTo(map);
+    let r = 8, op = 0.85;
+    const tick = setInterval(() => {
+      r += 6; op -= 0.12;
+      if (op <= 0) { clearInterval(tick); map.removeLayer(ring); return; }
+      ring.setRadius(r);
+      ring.setStyle({ opacity: op });
+    }, 50);
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return null;
+    const sec = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (sec < 5)              return 'ahora';
+    if (sec < 60)             return `${sec} segundo${sec !== 1 ? 's' : ''}`;
+    const m = Math.floor(sec / 60);
+    if (m < 60)               return `${m} minuto${m !== 1 ? 's' : ''}`;
+    const h = Math.floor(m / 60);
+    if (h < 24)               return `${h} hora${h !== 1 ? 's' : ''}`;
+    const d = Math.floor(h / 24);
+    if (d < 30)               return `${d} día${d !== 1 ? 's' : ''}`;
+    const mo = Math.floor(d / 30);
+    return `${mo} mes${mo !== 1 ? 'es' : ''}`;
+  }
+
+  function parseRxtime(s) {
+    // "20260424021128" → ISO UTC string
+    return new Date(
+      `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}T${s.slice(8,10)}:${s.slice(10,12)}:${s.slice(12,14)}Z`
+    ).toISOString();
+  }
+
+  // ── map setup ────────────────────────────────────────────
+  const map = L.map('map', { zoomControl: true });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 18
+  }).addTo(map);
+
+  furthestLayer = L.layerGroup().addTo(map);
+
+  // ── fullscreen control ───────────────────────────────────
+  const FS_EXPAND   = `<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1,5 1,1 5,1"/><polyline points="9,1 13,1 13,5"/><polyline points="13,9 13,13 9,13"/><polyline points="5,13 1,13 1,9"/></svg>`;
+  const FS_COMPRESS = `<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1,5 5,5 5,1"/><polyline points="9,1 9,5 13,5"/><polyline points="13,9 9,9 9,13"/><polyline points="5,13 5,9 1,9"/></svg>`;
+
+  let fsAnchor;
+  const fsControl = L.control({ position: 'topleft' });
+  fsControl.onAdd = function() {
+    const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+    fsAnchor = L.DomUtil.create('a', '', div);
+    fsAnchor.href  = '#';
+    fsAnchor.title = 'Pantalla completa';
+    fsAnchor.innerHTML = FS_EXPAND;
+    L.DomEvent.on(fsAnchor, 'click', e => {
+      L.DomEvent.preventDefault(e);
+      document.fullscreenElement ? document.exitFullscreen() : map.getContainer().requestFullscreen();
+    });
+    return div;
+  };
+  fsControl.addTo(map);
+
+  map.getContainer().addEventListener('fullscreenchange', () => {
+    fsAnchor.innerHTML = document.fullscreenElement ? FS_COMPRESS : FS_EXPAND;
+    map.invalidateSize();
+  });
+
+  // ── dom helpers ──────────────────────────────────────────
+  function makeMetric(label, value, noData) {
+    const wrap = document.createElement('div');
+    const lbl  = document.createElement('div');
+    const val  = document.createElement('div');
+    lbl.className = 'metric-label';
+    lbl.textContent = label;
+    val.className = noData ? 'metric-value no-data' : 'metric-value';
+    val.textContent = value || '—';
+    wrap.append(lbl, val);
+    return { wrap, val };
+  }
+
+  function createCard(s, cfg, dist) {
+    const dbStr   = s.level_db != null ? `${Number(s.level_db).toFixed(1)} dBm` : null;
+    const lastStr = fmtDate(s.last_heard);
+
+    const card = document.createElement('div');
+    card.className = `station-card status-${s.status || 'unknown'}`;
+
+    const badge = document.createElement('div');
+    badge.className = `card-badge ${cfg.badge}`;
+    badge.textContent = cfg.label;
+
+    const name = document.createElement('div');
+    name.className = 'card-name';
+    name.textContent = s.name;
+
+    const mmsiEl = document.createElement('div');
+    mmsiEl.className = 'card-mmsi';
+    mmsiEl.textContent = `MMSI ${s.mmsi}`;
+
+    const metrics = document.createElement('div');
+    metrics.className = 'card-metrics';
+
+    const distM  = makeMetric('Distancia', `${dist.toFixed(0)} km`, false);
+    const dbM    = makeMetric('Señal',     dbStr,        !dbStr);
+    const lastM  = makeMetric('Última RX', timeAgo(s.last_heard), !s.last_heard);
+    const coordM = makeMetric('Coord',     `${s.lat.toFixed(4)}, ${s.lng.toFixed(4)}`, false);
+    coordM.val.style.fontSize = '0.68rem';
+
+    metrics.append(distM.wrap, dbM.wrap, lastM.wrap, coordM.wrap);
+
+    const sparkWrap = document.createElement('div');
+    sparkWrap.className = 'spark-wrap';
+    sparkWrap.innerHTML = `<svg class="sparkline" id="spark-${s.mmsi}" viewBox="0 0 200 28" preserveAspectRatio="none"></svg>`;
+    card.append(badge, name, mmsiEl, metrics, sparkWrap);
+
+    return { card, badge, dbVal: dbM.val, lastVal: lastM.val };
+  }
+
+  // ── init stations (from stations.json) ───────────────────
+  function initStations(data) {
+    propThreshold = data.propagation_threshold ?? 50;
+    PTS_PER_KM    = data.pts_per_km ?? 0.1;
+    propMaxScore  = data.stations.reduce((s, st) => s + (st.score || 0), 0);
+    document.getElementById('prop-max').textContent = `/ ${propMaxScore}`;
+
+    rxStation = data.rx;
+    const rx  = data.rx;
+
+    // RX marker
+    L.circleMarker([rx.lat, rx.lng], {
+      radius: 7, fillColor: '#7dd3fc', color: '#fff', weight: 2, fillOpacity: 0.95
+    }).addTo(map).bindTooltip(`${rx.name} ▼ RX`, {
+      permanent: true, direction: 'top', className: 'map-tip'
+    });
+
+    const grid = document.getElementById('station-grid');
+
+    data.stations.forEach(s => {
+      const mmsi = String(s.mmsi);
+      stationData[mmsi] = { ...s };
+
+      const cfg  = STATUS_CFG[s.status] || STATUS_CFG.unknown;
+      const dist = haversineKm(rx.lat, rx.lng, s.lat, s.lng);
+
+      // polyline
+      const line = L.polyline([[rx.lat, rx.lng], [s.lat, s.lng]], {
+        color: cfg.color, weight: 2, opacity: 0.8, dashArray: cfg.dash
+      }).addTo(map).bindTooltip(s.name, { sticky: true, className: 'map-tip' });
+
+      // station marker
+      const marker = L.circleMarker([s.lat, s.lng], {
+        radius: 6, fillColor: cfg.color, color: cfg.color, weight: 1.5, fillOpacity: 0.85
+      }).addTo(map).bindTooltip(`<b>${s.name}</b><br>MMSI ${s.mmsi}`, {
+        permanent: true, direction: 'bottom', className: 'map-tip'
+      });
+
+      mapLayers[mmsi] = { line, marker };
+
+      // card
+      const refs = createCard(s, cfg, dist);
+      grid.appendChild(refs.card);
+      cardRefs[mmsi] = refs;
+    });
+
+    const allPts = [[rx.lat, rx.lng], ...data.stations.map(s => [s.lat, s.lng])];
+    map.fitBounds(L.latLngBounds(allPts).pad(0.3));
+
+    // card dinámico para el barco más lejano
+    const fCard = document.createElement('div');
+    fCard.className = 'station-card status-unknown'; fCard.id = 'furthest-card';
+    const fBadge = document.createElement('div');
+    fBadge.className = 'card-badge badge-furthest'; fBadge.textContent = '🚢 más lejano · 5 min';
+    const fName = document.createElement('div');
+    fName.className = 'card-name'; fName.id = 'furthest-name'; fName.textContent = '—';
+    const fMmsi = document.createElement('div');
+    fMmsi.className = 'card-mmsi'; fMmsi.id = 'furthest-mmsi';
+    const fMetrics = document.createElement('div'); fMetrics.className = 'card-metrics';
+    const fDistM  = makeMetric('Distancia', null, true); fDistM.val.id  = 'furthest-dist';
+    const fDbM    = makeMetric('Señal',     null, true); fDbM.val.id    = 'furthest-db';
+    const fLastM  = makeMetric('Última RX', null, true); fLastM.val.id  = 'furthest-last';
+    const fScoreM = makeMetric('Puntos',    null, true); fScoreM.val.id = 'furthest-score';
+    fMetrics.append(fDistM.wrap, fDbM.wrap, fLastM.wrap, fScoreM.wrap);
+    const fSparkWrap = document.createElement('div');
+    fSparkWrap.className = 'spark-wrap';
+    fSparkWrap.innerHTML = '<svg class="sparkline" id="spark-furthest" viewBox="0 0 200 28" preserveAspectRatio="none"></svg>';
+    fCard.append(fBadge, fName, fMmsi, fMetrics, fSparkWrap);
+    grid.appendChild(fCard);
+  }
+
+  // ── update one station on incoming MQTT message ──────────
+  function updateStation(mmsi, signalPower, rxtime) {
+    const s = stationData[mmsi];
+    if (!s) return;
+
+    s.status    = 'ok';
+    s.level_db  = signalPower;
+    s.last_heard = rxtime;
+
+    const cfg = STATUS_CFG.ok;
+
+    // map
+    mapLayers[mmsi].line.setStyle({ color: cfg.color, dashArray: null });
+    mapLayers[mmsi].line.setTooltipContent(`${s.name}<br>${signalPower.toFixed(1)} dBm`);
+    mapLayers[mmsi].marker.setStyle({ fillColor: cfg.color, color: cfg.color });
+
+    // card
+    const refs = cardRefs[mmsi];
+    refs.card.className   = 'station-card status-ok';
+    refs.badge.className  = `card-badge ${cfg.badge}`;
+    refs.badge.textContent = cfg.label;
+    refs.dbVal.className   = 'metric-value';
+    refs.dbVal.style.color = signalColor(signalPower);
+    refs.dbVal.textContent = `${signalPower.toFixed(1)} dBm`;
+    refs.lastVal.className = 'metric-value';
+    refs.lastVal.textContent = timeAgo(rxtime);
+
+    // flash card + pulse map marker + update propagation index
+    refs.card.classList.remove('rx-active');
+    void refs.card.offsetWidth; // restart animation
+    refs.card.classList.add('rx-active');
+    pulseMarker(s.lat, s.lng, signalColor(signalPower));
+    updatePropPanel();
+
+    if (!SIGNAL_HISTORY[mmsi]) SIGNAL_HISTORY[mmsi] = [];
+    SIGNAL_HISTORY[mmsi].push(signalPower);
+    if (SIGNAL_HISTORY[mmsi].length > HISTORY_MAX) SIGNAL_HISTORY[mmsi].shift();
+    renderSparkline(document.getElementById(`spark-${mmsi}`), SIGNAL_HISTORY[mmsi]);
+  }
+
+  // ── MQTT status bar ──────────────────────────────────────
+  const elDot    = document.getElementById('live-dot');
+  const elStatus = document.getElementById('mqtt-status');
+  const elLastMsg  = document.getElementById('last-msg');
+  const elLastSep  = document.getElementById('last-msg-sep');
+
+  function setMqttStatus(state, extra) {
+    const cfg = {
+      connecting:   { dot: '#f39c12', text: 'Conectando al broker…' },
+      connected:    { dot: '#2ecc71', text: 'Conectado' },
+      reconnecting: { dot: '#f39c12', text: 'Reconectando…' },
+      error:        { dot: '#e74c3c', text: extra || 'Error de conexión' },
+      offline:      { dot: '#e74c3c', text: 'Broker desconectado' },
+    }[state];
+    elDot.style.background = cfg.dot;
+    elStatus.textContent   = cfg.text;
+  }
+
+  function setLastPacket(iso) {
+    elLastSep.style.display = '';
+    elLastMsg.textContent = `último dato: ${fmtFull(iso)}`;
+  }
+
+  // ── MQTT connection ──────────────────────────────────────
+  function connectMQTT() {
+    const client = mqtt.connect(MQTT_URL, {
+      reconnectPeriod: 5000,
+      connectTimeout:  10000,
+    });
+
+    client.on('connect',     ()    => { setMqttStatus('connected'); client.subscribe(MQTT_TOPIC); });
+    client.on('reconnect',   ()    => setMqttStatus('reconnecting'));
+    client.on('offline',     ()    => setMqttStatus('offline'));
+    client.on('error',       (err) => setMqttStatus('error', err.message));
+
+    client.on('message', (_topic, payload) => {
+      let msg;
+      try { msg = JSON.parse(payload.toString()); } catch { return; }
+      if (!msg.mmsi || !msg.rxtime) return;
+
+      const mmsi   = String(msg.mmsi);
+      const rxtime = parseRxtime(msg.rxtime);
+
+      if (stationData[mmsi] && msg.signalpower != null) {
+        updateStation(mmsi, msg.signalpower, rxtime);
+        setLastPacket(rxtime);
+      }
+
+      updateRecentVessels(msg, rxtime);
+    });
+  }
+
+  // refresca tiempos relativos cada 30 s
+  setInterval(() => {
+    Object.entries(stationData).forEach(([mmsi, s]) => {
+      if (s.last_heard && cardRefs[mmsi])
+        cardRefs[mmsi].lastVal.textContent = timeAgo(s.last_heard);
+    });
+    if (currentFurthest)
+      document.getElementById('furthest-last').textContent = timeAgo(currentFurthest.rxtime);
+  }, 30000);
+
+  // reset del barco más lejano cada 5 minutos → empieza selección desde cero
+  setInterval(() => {
+    currentFurthest = null;
+    SIGNAL_HISTORY['furthest'] = [];
+    furthestPrevMmsi = null;
+    updateFurthestVessel(null);
+    updatePropPanel();
+  }, FURTHEST_RESET_MS);
+
+  // ── boot ─────────────────────────────────────────────────
+  fetch('stations.json')
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => { initStations(data); connectMQTT(); })
+    .catch(() => {
+      elStatus.textContent = 'Error al cargar stations.json';
+    });
+</script>
+
+</body>
+</html>

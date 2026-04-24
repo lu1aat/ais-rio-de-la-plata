@@ -1,0 +1,32 @@
+{
+  "updated": null,
+  "propagation_threshold": 50,
+  "pts_per_km": 0.1,
+  "rx": {
+    "name": "BUCEO",
+    "lat": -34.897952,
+    "lng": -56.119752
+  },
+  "stations": [
+    {
+      "mmsi": "7010030",
+      "name": "🚢 DF19 Recalada",
+      "lat": -35.100880,
+      "lng": -55.973152,
+      "score": 1,
+      "status": "unknown",
+      "last_heard": null,
+      "level_db": null
+    },
+    {
+      "mmsi": "7010021",
+      "name": "⚓ Faro Punta Piedras",
+      "lat": -35.379520,
+      "lng": -57.160439,
+      "score": 50,
+      "status": "unknown",
+      "last_heard": null,
+      "level_db": null
+    }
+  ]
+}
