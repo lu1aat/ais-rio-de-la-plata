@@ -47,7 +47,7 @@
     main {
       margin: 3.5rem auto;
       padding: 0 2rem;
-      max-width: 70%;
+      max-width: 900px;
     }
 
     .post-meta {
@@ -510,6 +510,7 @@
   const stationData = {};   // mmsi → station object
   const mapLayers   = {};   // mmsi → { line, marker }
   const cardRefs    = {};   // mmsi → { card, badge, dbVal, lastVal }
+  const vesselNames = {};   // mmsi → vessel name (cache, populated from msg.name)
 
   let propThreshold = 50;
   let propMaxScore  = 0;
@@ -636,7 +637,7 @@
     if (!currentFurthest || dist > currentFurthest.distance) {
       currentFurthest = {
         mmsi:        msg.mmsi,
-        name:        msg.shipname || null,
+        name:        vesselNames[String(msg.mmsi)] || msg.name || null,
         lat, lon,
         distance:    dist,
         rxtime,
@@ -644,7 +645,11 @@
       };
       updateFurthestVessel(currentFurthest);
     } else if (currentFurthest && String(currentFurthest.mmsi) === String(msg.mmsi) && msg.signalpower != null) {
-      // mismo barco escuchado de nuevo — acumula señal sin romper récord
+      // mismo barco escuchado de nuevo — acumula señal y actualiza nombre si llegó en otro mensaje
+      if (!currentFurthest.name && vesselNames[String(msg.mmsi)]) {
+        currentFurthest.name = vesselNames[String(msg.mmsi)];
+        updateFurthestVessel(currentFurthest);
+      }
       SIGNAL_HISTORY['furthest'].push(msg.signalpower);
       if (SIGNAL_HISTORY['furthest'].length > HISTORY_MAX) SIGNAL_HISTORY['furthest'].shift();
       renderSparkline(document.getElementById('spark-furthest'), SIGNAL_HISTORY['furthest']);
@@ -995,6 +1000,8 @@
 
       const mmsi   = String(msg.mmsi);
       const rxtime = parseRxtime(msg.rxtime);
+
+      if (msg.name) vesselNames[mmsi] = msg.name;
 
       if (stationData[mmsi] && msg.signalpower != null) {
         updateStation(mmsi, msg.signalpower, rxtime);

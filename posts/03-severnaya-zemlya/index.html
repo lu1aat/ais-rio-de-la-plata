@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEVERNAYA ZEMLYA: Inconsistencias AIS — AIS Rio de la Plata</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0f1e;
+      color: #c8d8f0;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+    header {
+      border-bottom: 1px solid #1e3a5f;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .logo { font-size: 1.4rem; line-height: 1; text-decoration: none; }
+
+    .site-title a {
+      font-size: 0.85rem;
+      color: #4a7a9b;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    .site-title a:hover { color: #7dd3fc; }
+
+    main {
+      margin: 3.5rem auto;
+      padding: 0 2rem;
+      max-width: 800px;
+    }
+
+    .post-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: #4a7a9b;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 2.5rem;
+      color: #e8f4ff;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .post-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #4a7a9b;
+      margin-bottom: 2rem;
+      letter-spacing: 0.06em;
+    }
+
+    .intro p {
+      font-size: 0.95rem;
+      color: #a8c0d8;
+      margin-bottom: 0.5rem;
+    }
+    .intro p:last-child { margin-bottom: 0; }
+
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      color: #7dd3fc;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 3rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    h3 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 1rem;
+      color: #a8c8e8;
+      font-weight: 600;
+      margin: 2rem 0 0.65rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #b8cfe8;
+      margin-bottom: 1rem;
+    }
+
+    strong { color: #e8f4ff; font-weight: 600; }
+
+    em {
+      font-family: 'JetBrains Mono', monospace;
+      font-style: normal;
+      font-size: 0.88em;
+      color: #7dd3fc;
+      background: #0d1a2e;
+      border: 1px solid #1a3050;
+      padding: 0.05em 0.35em;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #0d1a2e;
+      border: 1px solid #1e3a5f;
+      padding: 0.1em 0.4em;
+      font-size: 0.83em;
+      color: #7dd3fc;
+    }
+
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── callout box ─────────────────────────────────── */
+    .callout {
+      border-left: 3px solid #1e3a5f;
+      background: #0d1a2e;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .callout p {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      color: #a0b8d0;
+    }
+
+    /* ── debate box ──────────────────────────────────── */
+    .debate-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: #1e3a5f;
+      border: 1px solid #1e3a5f;
+      margin: 1.25rem 0;
+    }
+
+    .debate-side {
+      background: #0d1a2e;
+      padding: 1rem 1.25rem;
+    }
+
+    .debate-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #4a7a9b;
+      margin-bottom: 0.6rem;
+    }
+
+    .debate-side p {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      margin-bottom: 0.4rem;
+      color: #a8c0d8;
+    }
+    .debate-side p:last-child { margin-bottom: 0; }
+
+    .val-changed { color: #e74c3c; }
+    .val-same    { color: #2ecc71; }
+
+    /* ── table ───────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      background: #0d1a2e;
+      color: #4a7a9b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #0f1e35;
+      vertical-align: top;
+      line-height: 1.55;
+      color: #b8cfe8;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #7dd3fc;
+      white-space: nowrap;
+      font-size: 0.82rem;
+    }
+
+    /* ── images ──────────────────────────────────────── */
+    .img-block { margin: 1.5rem 0; }
+
+    .img-block.half-right {
+      float: right;
+      width: 50%;
+      margin: 0 0 1.5rem 2rem;
+    }
+
+    .clearfix::after { content: ''; display: table; clear: both; }
+
+    .img-block img {
+      width: 100%;
+      display: block;
+      border: 1px solid #1e3a5f;
+    }
+
+    .img-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #4a7a9b;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    .gallery {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+    .gallery-2 { grid-template-columns: repeat(2, 1fr); }
+    .gallery-4 { grid-template-columns: repeat(2, 1fr); }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1e3a5f;
+      margin: 2.5rem 0;
+    }
+
+    /* ── toc ─────────────────────────────────────────── */
+    .toc {
+      border: 1px solid #1e3a5f;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 2.5rem;
+      display: inline-block;
+      min-width: 220px;
+    }
+
+    .toc-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #4a7a9b;
+      margin-bottom: 0.6rem;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-section;
+      margin: 0;
+      padding: 0;
+    }
+
+    .toc > ol > li {
+      counter-increment: toc-section;
+      margin-bottom: 0.25rem;
+    }
+
+    .toc > ol > li > a::before {
+      content: counter(toc-section) '. ';
+      font-family: 'JetBrains Mono', monospace;
+      color: #4a7a9b;
+      font-size: 0.78rem;
+    }
+
+    .toc a {
+      font-size: 0.82rem;
+      color: #a8c0d8;
+      text-decoration: none;
+    }
+    .toc a:hover { color: #7dd3fc; text-decoration: none; }
+
+    /* ── post footer ─────────────────────────────────── */
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1e3a5f;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #4a7a9b;
+      line-height: 2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #2a4a6a;
+      font-size: 0.72rem;
+    }
+
+    footer a { color: #4a7a9b; text-decoration: none; }
+    footer a:hover { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../">⚓📡</a>
+  <div class="site-title">
+    <a href="../../">AIS · Rio de la Plata</a>
+  </div>
+</header>
+
+<main>
+
+  <p class="post-meta">Publicación #03</p>
+  <h1>SEVERNAYA ZEMLYA: Inconsistencias en mensajes AIS</h1>
+  <p class="post-date">14–15 de febrero de 2026</p>
+
+  <div class="toc">
+    <p class="toc-title">Índice</p>
+    <ol>
+      <li><a href="#el-buque">El buque</a></li>
+      <li><a href="#mensajes-tipo-5">Mensajes tipo 5</a></li>
+      <li><a href="#campos-inconsistentes">Campos inconsistentes</a></li>
+      <li><a href="#patron-operativo">Patrón operativo</a></li>
+      <li><a href="#escala-vigo">Escala en Vigo</a></li>
+      <li><a href="#recepcion">Recepción</a></li>
+      <li><a href="#fuentes">Fuentes</a></li>
+    </ol>
+  </div>
+
+  <div class="intro">
+    <p>El 13 de febrero de 2026 llegó al puerto de Montevideo el pesquero ruso <strong>SEVERNAYA ZEMLYA</strong>, propiedad de RQF CO LTD. Al analizar sus transmisiones AIS aparecieron inconsistencias llamativas: dos conjuntos de valores distintos en campos que deberían ser estáticos, lo que sugiere la presencia de dos transponders con configuraciones diferentes o un error de programación inusual.</p>
+  </div>
+
+  <!-- ── El buque ───────────────────────────────────── -->
+  <h2 id="el-buque">El buque</h2>
+
+  <div class="clearfix">
+    <div class="img-block half-right">
+      <img src="https://pbs.twimg.com/media/HBKhqjxakAMyBWs?format=jpg&name=large" alt="SEVERNAYA ZEMLYA en puerto de Montevideo">
+      <p class="img-caption">SEVERNAYA ZEMLYA — Puerto de Montevideo, 13 feb 2026</p>
+    </div>
+
+    <p>El <strong>SEVERNAYA ZEMLYA</strong> es un buque pesquero de bandera rusa 🇷🇺, de <strong>74 metros de eslora</strong>, operado por RQF CO LTD. Lleva años trabajando en el Atlántico Sur, usando Montevideo como puerto de descarga y reabastecimiento entre campañas de pesca.</p>
+
+    <table>
+      <thead>
+        <tr><th>Campo</th><th>Valor</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>MMSI</td><td>273340810</td></tr>
+        <tr><td>IMO</td><td>8206545</td></tr>
+        <tr><td>Callsign</td><td>UBSE8 / UBSE-8</td></tr>
+        <tr><td>Bandera</td><td>🇷🇺 Rusia</td></tr>
+        <tr><td>Propietario</td><td>RQF CO LTD</td></tr>
+        <tr><td>Eslora</td><td>74 m</td></tr>
+      </tbody>
+    </table>
+
+    <p>En el contexto del análisis de datos AIS del Río de la Plata, sus transmisiones presentaron algo inusual: el mismo buque —MMSI <code>273340810</code>— emitía mensajes tipo 5 con campos estáticos que variaban entre transmisiones, algo que no debería ocurrir.</p>
+  </div>
+
+  <div class="gallery gallery-4">
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKhuawX0AALGqH?format=jpg&name=large" alt="SEVERNAYA ZEMLYA — captura AIS 1">
+      <p class="img-caption">Captura AIS — datos del buque en pantalla</p>
+    </div>
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKhvgDagAAqhc3?format=jpg&name=large" alt="SEVERNAYA ZEMLYA — captura AIS 2">
+      <p class="img-caption">Captura AIS — segunda lectura con valores distintos</p>
+    </div>
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKhwkgXUAA37tn?format=png&name=large" alt="SEVERNAYA ZEMLYA — detalle de inconsistencias">
+      <p class="img-caption">Detalle de las inconsistencias detectadas</p>
+    </div>
+  </div>
+
+  <!-- ── Mensajes tipo 5 ────────────────────────────── -->
+  <h2 id="mensajes-tipo-5">Mensajes tipo 5</h2>
+
+  <p>En AIS, los <strong>mensajes tipo 5</strong> (Voyage Related Data) contienen información estática y de viaje del buque: nombre, callsign, tipo de buque, dimensiones y destino. A diferencia de los mensajes tipo 1/2/3 que transmiten posición y velocidad en tiempo real, el tipo 5 se emite con menor frecuencia —típicamente cada 6 minutos— y sus campos no deberían cambiar durante una misma estadía en puerto.</p>
+
+  <p>El SEVERNAYA ZEMLYA transmitía dos variantes distintas de este mensaje, denominadas aquí <strong>A</strong> y <strong>B</strong>:</p>
+
+  <div class="debate-box">
+    <div class="debate-side">
+      <p class="debate-label">Transmisor A</p>
+      <p>Nombre: <strong class="val-changed">SEVERNAYA ZEMLYA</strong></p>
+      <p>Callsign: <strong class="val-changed">UBSE-8</strong></p>
+      <p>Dim A/B: <strong class="val-changed">20 / 54</strong> m</p>
+      <p>Dim C/D: <strong class="val-same">3</strong> / <strong class="val-changed">7</strong> m</p>
+      <p>Destino: <em>(no reportado)</em></p>
+    </div>
+    <div class="debate-side">
+      <p class="debate-label">Transmisor B</p>
+      <p>Nombre: <strong class="val-changed">SEVERNAYA ZEMLIA</strong></p>
+      <p>Callsign: <strong class="val-changed">UBSE8</strong></p>
+      <p>Dim A/B: <strong class="val-changed">18 / 56</strong> m</p>
+      <p>Dim C/D: <strong class="val-same">3</strong> / <strong class="val-changed">3</strong> m</p>
+      <p>Destino: <strong>MONTET</strong></p>
+    </div>
+  </div>
+
+  <div class="gallery gallery-2">
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKnYhTWIAA2g6w?format=png&name=large" alt="Mensajes tipo 5 — variante A">
+      <p class="img-caption">Mensajes tipo 5 — variante A (SEVERNAYA ZEMLYA / UBSE-8)</p>
+    </div>
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKnZ6yXMAAz68K?format=png&name=large" alt="Mensajes tipo 5 — variante B">
+      <p class="img-caption">Mensajes tipo 5 — variante B (SEVERNAYA ZEMLIA / UBSE8)</p>
+    </div>
+  </div>
+
+  <!-- ── Campos inconsistentes ─────────────────────── -->
+  <h2 id="campos-inconsistentes">Campos inconsistentes</h2>
+
+  <p>Al comparar los dos conjuntos de mensajes se identifican tres categorías de diferencias:</p>
+
+  <h3>1. Nombre del buque</h3>
+
+  <p>La variante A transmite <code>SEVERNAYA ZEMLYA</code> (con Y), mientras que la variante B transmite <code>SEVERNAYA ZEMLIA</code> (con I). Ambas son transliteraciones del ruso <em>Северная Земля</em> ("Tierra del Norte"), pero el estándar internacional usa la Y. El cambio de una sola letra en el nombre dificulta la búsqueda en bases de datos y puede generar registros duplicados.</p>
+
+  <h3>2. Callsign</h3>
+
+  <p>La variante A incluye un guion: <code>UBSE-8</code>. La variante B transmite <code>UBSE8</code> sin guion. Los indicativos de llamada de estación de barco (<em>callsign</em>) no llevan guiones en el formato estándar del ITU, por lo que la variante A es anómala. En el contexto de AIS, donde el campo tiene un largo máximo de 7 caracteres, la inclusión del guion tampoco es habitual.</p>
+
+  <h3>3. Dimensiones y posición de la antena</h3>
+
+  <p>En AIS, el campo de dimensiones no representa largo y ancho del casco directamente, sino las distancias desde la antena GPS hasta cada extremo del buque: A (proa), B (popa), C (babor), D (estribor). Sumando los pares:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Dimensión</th>
+        <th>Transmisor A</th>
+        <th>Transmisor B</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Eslora (A+B)</td>
+        <td>20 + 54 = <strong>74 m</strong></td>
+        <td>18 + 56 = <strong>74 m</strong></td>
+      </tr>
+      <tr>
+        <td>Manga (C+D)</td>
+        <td>3 + 7 = <strong>10 m</strong></td>
+        <td>3 + 3 = <strong>6 m</strong></td>
+      </tr>
+      <tr>
+        <td>Posición longitudinal ant.</td>
+        <td>20 m desde proa</td>
+        <td>18 m desde proa</td>
+      </tr>
+      <tr>
+        <td>Posición transversal ant.</td>
+        <td>3 m babor / 7 m estribor</td>
+        <td>3 m babor / 3 m estribor</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>La eslora coincide en ambos (74 m), pero la manga declarada difiere: 10 m en A vs 6 m en B. La posición de la antena también varía en ambos ejes, lo que sugiere que las dos variantes fueron configuradas en momentos distintos, posiblemente con datos tomados de fuentes diferentes.</p>
+
+  <div class="callout">
+    <p><strong>¿Un bug o dos transponders?</strong> La hipótesis más probable es la existencia de dos transponders AIS a bordo con configuraciones distintas, posiblemente instalados en diferentes etapas de la vida del buque. Ambos comparten el mismo MMSI (identificador del buque en AIS), pero cada uno transmite su propia versión de los datos estáticos.</p>
+  </div>
+
+  <!-- ── Patrón operativo ───────────────────────────── -->
+  <h2 id="patron-operativo">Patrón operativo</h2>
+
+  <p>El SEVERNAYA ZEMLYA mantiene un patrón operativo consistente en el Atlántico Sur desde hace varios años: usa <strong>Montevideo como base logística</strong> para descargar capturas congeladas y reabastecerse de combustible, mientras realiza campañas de pesca en el límite exterior de la Zona Económica Exclusiva argentina —la conocida "milla 201"—, habitualmente cerca de las coordenadas <strong>46°S / 60°W</strong>.</p>
+
+  <div class="gallery gallery-2">
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKwKSeXEAAiRXN?format=jpg&name=large" alt="Track histórico del SEVERNAYA ZEMLYA en el Atlántico Sur">
+      <p class="img-caption">Track histórico — campañas de pesca en el límite de la ZEE argentina</p>
+    </div>
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKwLnHbcAAYXjj?format=png&name=large" alt="Detalle de posiciones en zona de pesca — 46°S 60°W">
+      <p class="img-caption">Posiciones en zona de pesca — 46°S / 60°W, milla 201</p>
+    </div>
+  </div>
+
+  <p>Esta área, justo fuera de las 200 millas náuticas de la ZEE argentina, es una de las más concurridas por flotas pesqueras de altura en el Atlántico Sudoccidental. La combinación de alta riqueza pesquera y ausencia de jurisdicción exclusiva la convierte en destino frecuente de flotas rusas, chinas y coreanas.</p>
+
+  <!-- ── Escala en Vigo ──────────────────────────────── -->
+  <h2 id="escala-vigo">Escala en Vigo</h2>
+
+  <p>Antes de su llegada a Montevideo en febrero de 2026, el historial AIS del SEVERNAYA ZEMLYA muestra que el buque pasó <strong>56 días en reparaciones en Vigo</strong> (España), entre noviembre y enero:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Campo</th>
+        <th>Dato</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Fecha/hora</td>
+        <td>2025-11-21 14:36 UTC+1</td>
+      </tr>
+      <tr>
+        <td>Posición</td>
+        <td>42.225544°N / 8.747686°W</td>
+      </tr>
+      <tr>
+        <td>Estado</td>
+        <td>Atracado (Docked)</td>
+      </tr>
+      <tr>
+        <td>Muelle</td>
+        <td>Slipways N° 7 a 9</td>
+      </tr>
+      <tr>
+        <td>Terminal</td>
+        <td>Astilleros Francisco Cardama</td>
+      </tr>
+      <tr>
+        <td>Puerto</td>
+        <td>Vigo</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="gallery gallery-2">
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKzr_rWgAAqtmm?format=png&name=large" alt="Posición AIS del SEVERNAYA ZEMLYA en Vigo">
+      <p class="img-caption">Posición AIS en Vigo — noviembre 2025</p>
+    </div>
+    <div class="img-block">
+      <img src="https://pbs.twimg.com/media/HBKztuNXEAACLyI?format=png&name=large" alt="Vista de mapa — ubicación en astillero de Vigo">
+      <p class="img-caption">Vista de mapa — la posición corresponde más a Astilleros Armada que a Francisco Cardama</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p>Curiosidad: el dato del terminal dice "Astilleros Francisco Cardama", pero la ubicación geográfica registrada en AIS parece corresponder más bien a las instalaciones de <strong>Astilleros Armada</strong>, que están en la misma dársena. La discrepancia puede deberse a que el nombre del terminal proviene de una base de datos de puertos que no distingue entre los dos astilleros adyacentes.</p>
+  </div>
+
+  <p>Una estadía de 56 días en astillero es significativa: sugiere trabajos de mantenimiento mayor, posiblemente incluyendo el sistema de propulsión o el casco. Que el buque haya salido de reparaciones y navegado directamente a la ZEE argentina —con escala en Montevideo— es coherente con el patrón operativo ya descripto.</p>
+
+  <!-- ── Recepción ───────────────────────────────────── -->
+  <h2 id="recepcion">Recepción</h2>
+
+  <p>Los mensajes AIS analizados en este artículo fueron recibidos localmente en <strong>161.975 MHz (Canal 87B)</strong> y <strong>162.025 MHz (Canal 88B)</strong>, los dos canales VHF estándar del sistema AIS. Las antenas utilizadas para la banda de 2 metros funcionan correctamente para recepción de buques en el Río de la Plata y el Río Uruguay.</p>
+
+  <!-- ── Fuentes ─────────────────────────────────────── -->
+  <h2 id="fuentes">Fuentes</h2>
+
+  <table>
+    <thead>
+      <tr><th>Fuente</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2022857064817610899" target="_blank" rel="noopener noreferrer">Tweet #1</a></td>
+        <td>Llegada del SEVERNAYA ZEMLYA a Montevideo — primeras inconsistencias detectadas</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2022863412363985194" target="_blank" rel="noopener noreferrer">Tweet #2</a></td>
+        <td>Mensajes tipo 5 — detalle de los dos conjuntos de valores (A y B)</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2022866427900801503" target="_blank" rel="noopener noreferrer">Tweet #3</a></td>
+        <td>Análisis campo a campo: callsign, nombre y dimensiones</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2022872986143875230" target="_blank" rel="noopener noreferrer">Tweet #4</a></td>
+        <td>Patrón operativo histórico — ZEE argentina, 46°S 60°W</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2022875437261566310" target="_blank" rel="noopener noreferrer">Tweet #5</a></td>
+        <td>Escala previa en Vigo — 56 días en astillero</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2022876845595595255" target="_blank" rel="noopener noreferrer">Tweet #6</a></td>
+        <td>Ubicación en Vigo — Astilleros Cardama vs. Astilleros Armada</td>
+      </tr>
+      <tr>
+        <td><a href="https://x.com/LU1AAT/status/2023024367589032256" target="_blank" rel="noopener noreferrer">Tweet #7</a></td>
+        <td>Frecuencias de recepción: 161.975 MHz y 162.025 MHz (canales 87B / 88B)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="post-footer">
+    <p>Análisis: LU1AAT / CX9CAT — <a href="https://lu1aat.github.io/ais-rio-de-la-plata/" target="_blank" rel="noopener noreferrer">AIS Rio de la Plata</a></p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="../../">← Volver al inicio</a>
+</footer>
+
+</body>
+</html>
