@@ -637,7 +637,7 @@
     if (!currentFurthest || dist > currentFurthest.distance) {
       currentFurthest = {
         mmsi:        msg.mmsi,
-        name:        vesselNames[String(msg.mmsi)] || msg.name || null,
+        name:        vesselNames[String(msg.mmsi)] || msg.name || msg.shipname || null,
         lat, lon,
         distance:    dist,
         rxtime,
@@ -1001,7 +1001,13 @@
       const mmsi   = String(msg.mmsi);
       const rxtime = parseRxtime(msg.rxtime);
 
-      if (msg.name) vesselNames[mmsi] = msg.name;
+      if (msg.name || msg.shipname) {
+        vesselNames[mmsi] = msg.name || msg.shipname;
+        if (currentFurthest && String(currentFurthest.mmsi) === mmsi && !currentFurthest.name) {
+          currentFurthest.name = msg.name || msg.shipname;
+          updateFurthestVessel(currentFurthest);
+        }
+      }
 
       if (stationData[mmsi] && msg.signalpower != null) {
         updateStation(mmsi, msg.signalpower, rxtime);
