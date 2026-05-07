@@ -19,7 +19,7 @@
     body {
       font-family: 'Inter', system-ui, sans-serif;
       background: #0a0f1e;
-      color: #c8d8f0;
+      color: #dce8f8;
       min-height: 100vh;
       font-size: 16px;
       line-height: 1.6;
@@ -38,7 +38,7 @@
 
     .site-title a {
       font-size: 0.85rem;
-      color: #4a7a9b;
+      color: #7aaec8;
       text-decoration: none;
       letter-spacing: 0.04em;
     }
@@ -54,7 +54,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.68rem;
       letter-spacing: 0.14em;
-      color: #4a7a9b;
+      color: #7aaec8;
       text-transform: uppercase;
       margin-bottom: 0.6rem;
     }
@@ -71,7 +71,7 @@
     .post-date {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.72rem;
-      color: #4a7a9b;
+      color: #7aaec8;
       margin-bottom: 1.75rem;
       letter-spacing: 0.06em;
     }
@@ -79,7 +79,7 @@
     p {
       font-size: 0.95rem;
       line-height: 1.75;
-      color: #b8cfe8;
+      color: #d0e4f6;
       margin-bottom: 1rem;
     }
 
@@ -92,7 +92,7 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #2a4a6a;
+      background: #4a6e90;
       flex-shrink: 0;
       transition: background 0.4s;
     }
@@ -112,7 +112,7 @@
     .leaflet-tooltip.map-tip {
       background: #0d1a2e;
       border: 1px solid #1e3a5f;
-      color: #c8d8f0;
+      color: #dce8f8;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.7rem;
       padding: 0.3rem 0.55rem;
@@ -120,6 +120,19 @@
       box-shadow: none;
     }
     .leaflet-tooltip.map-tip::before { border: none; }
+
+    .leaflet-tooltip.dist-label {
+      background: none;
+      border: none;
+      box-shadow: none;
+      color: #dce8f8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      padding: 0;
+      text-shadow: 0 0 4px #060c18, 0 0 8px #060c18;
+    }
+    .leaflet-tooltip.dist-label::before { display: none; }
 
     #map:-webkit-full-screen { height: 100vh !important; }
     #map:fullscreen           { height: 100vh !important; }
@@ -135,7 +148,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.68rem;
       letter-spacing: 0.08em;
-      color: #4a7a9b;
+      color: #7aaec8;
     }
 
     .legend-item { display: flex; align-items: center; gap: 0.4rem; }
@@ -173,7 +186,7 @@
       transition: background 0.4s;
     }
 
-    .station-card.status-unknown::before { background: #2a4a6a; }
+    .station-card.status-unknown::before { background: #4a6e90; }
     .station-card.status-ok::before      { background: #2ecc71; }
     .station-card.status-nok::before     { background: #e74c3c; }
 
@@ -189,14 +202,14 @@
       transition: color 0.4s, border-color 0.4s;
     }
 
-    .badge-unknown  { color: #4a7a9b; border-color: #1e3a5f; }
+    .badge-unknown  { color: #7aaec8; border-color: #1e3a5f; }
     .badge-ok       { color: #2ecc71; border-color: rgba(46,204,113,.35); }
     .badge-nok      { color: #e74c3c; border-color: rgba(231,76,60,.35); }
     .badge-furthest { color: #7dd3fc; border-color: rgba(125,211,252,.3); }
 
     /* furthest vessel card overrides the green ok border */
     #furthest-card.status-ok::before      { background: #7dd3fc; }
-    #furthest-card.status-unknown::before { background: #2a4a6a; }
+    #furthest-card.status-unknown::before { background: #4a6e90; }
 
     .card-name {
       font-size: 0.95rem;
@@ -208,7 +221,7 @@
     .card-mmsi {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.68rem;
-      color: #4a7a9b;
+      color: #7aaec8;
       letter-spacing: 0.08em;
       margin-bottom: 0.9rem;
     }
@@ -224,7 +237,7 @@
       font-size: 0.58rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #4a7a9b;
+      color: #7aaec8;
       margin-bottom: 0.1rem;
     }
 
@@ -235,7 +248,7 @@
       transition: color 0.3s;
     }
 
-    .metric-value.no-data { color: #2a4a6a; }
+    .metric-value.no-data { color: #4a6e90; }
 
     /* ── signal sparkline ────────────────────────────── */
     .spark-wrap {
@@ -256,7 +269,7 @@
       text-align: left;
       padding: 0.45rem 0.75rem;
       background: #060c18;
-      color: #4a7a9b;
+      color: #7aaec8;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.6rem;
       letter-spacing: 0.12em;
@@ -266,7 +279,7 @@
     td {
       padding: 0.55rem 0.75rem;
       border-bottom: 1px solid #0f1e35;
-      color: #b8cfe8;
+      color: #d0e4f6;
       vertical-align: middle;
       line-height: 1.5;
     }
@@ -282,15 +295,16 @@
       margin: 1.75rem 0 0;
       transition: border-color 0.5s;
     }
-    .prop-panel.status-ok  { border-color: rgba(46, 204, 113, 0.45); }
-    .prop-panel.status-nok { border-color: rgba(231, 76, 60, 0.35); }
+    .prop-panel.status-ok,
+    .prop-panel.status-warn,
+    .prop-panel.status-nok  { /* border-color set via inline style (dynamic gradient) */ }
 
     .prop-heading {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.65rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #4a7a9b;
+      color: #7aaec8;
       margin-bottom: 0.9rem;
     }
 
@@ -313,14 +327,14 @@
       font-size: 3.2rem;
       font-weight: 700;
       line-height: 1;
-      color: #2a4a6a;
+      color: #4a6e90;
       transition: color 0.4s;
     }
 
     .prop-max {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.78rem;
-      color: #2a4a6a;
+      color: #4a6e90;
     }
 
     .prop-status-wrap {
@@ -331,14 +345,14 @@
       font-size: 1.6rem;
       font-weight: 700;
       letter-spacing: 0.03em;
-      color: #4a7a9b;
+      color: #7aaec8;
     }
 
     .prop-dot {
       width: 13px;
       height: 13px;
       border-radius: 50%;
-      background: #2a4a6a;
+      background: #4a6e90;
       flex-shrink: 0;
       transition: background 0.4s;
     }
@@ -352,7 +366,7 @@
 
     .prop-bar-fill {
       height: 100%;
-      background: #2a4a6a;
+      background: #4a6e90;
       width: 0%;
       transition: width 0.5s ease-out, background 0.4s;
     }
@@ -362,7 +376,7 @@
       top: -4px;
       width: 1px;
       height: 11px;
-      background: #4a7a9b;
+      background: #7aaec8;
     }
 
     /* ── animated vessel link ────────────────────────── */
@@ -387,7 +401,7 @@
       border-top: 1px solid #1e3a5f;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.72rem;
-      color: #4a7a9b;
+      color: #7aaec8;
       line-height: 2;
     }
 
@@ -395,10 +409,10 @@
       text-align: center;
       padding: 3rem 2rem;
       font-family: 'JetBrains Mono', monospace;
-      color: #2a4a6a;
+      color: #4a6e90;
       font-size: 0.72rem;
     }
-    footer a { color: #4a7a9b; text-decoration: none; }
+    footer a { color: #7aaec8; text-decoration: none; }
     footer a:hover { color: #7dd3fc; }
   </style>
 </head>
@@ -469,7 +483,7 @@
       <span>recibido</span>
     </div>
     <div class="legend-item">
-      <div class="legend-swatch" style="background:repeating-linear-gradient(90deg,#2a4a6a 0 5px,transparent 5px 9px)"></div>
+      <div class="legend-swatch" style="background:repeating-linear-gradient(90deg,#4a6e90 0 5px,transparent 5px 9px)"></div>
       <span>sin datos</span>
     </div>
     <div class="map-status">
@@ -483,7 +497,7 @@
   <div class="station-grid" id="station-grid"></div>
 
   <div class="post-footer">
-    <p>RX: LU1AAT / CX9CAT — BUCEO, Montevideo — <a href="../../">AIS Rio de la Plata</a></p>
+    <p>RX: <a href="https://x.com/LU1AAT" target="_blank" rel="noopener noreferrer">LU1AAT</a> / CX9CAT — BUCEO, Montevideo — <a href="../../">AIS Rio de la Plata</a></p>
   </div>
 
 </main>
@@ -503,7 +517,7 @@
   const STATUS_CFG = {
     ok:      { color: '#2ecc71', label: 'recibido',    badge: 'badge-ok',      dash: null },
     nok:     { color: '#e74c3c', label: 'no recibido', badge: 'badge-nok',     dash: null },
-    unknown: { color: '#2a4a6a', label: 'sin datos',   badge: 'badge-unknown', dash: '6 6' },
+    unknown: { color: '#4a6e90', label: 'sin datos',   badge: 'badge-unknown', dash: '6 6' },
   };
 
   // ── state (keyed by mmsi string) ─────────────────────────
@@ -583,8 +597,8 @@
     const line = L.polyline([[rxStation.lat, rxStation.lng], [vessel.lat, vessel.lon]], {
       color: lineColor, weight: 2, opacity: 0.75, dashArray: '12 8'
     }).addTo(furthestLayer).bindTooltip(
-      `${label}<br>${vessel.distance.toFixed(0)} km`,
-      { sticky: true, className: 'map-tip' }
+      `${vessel.distance.toFixed(0)} km`,
+      { permanent: true, className: 'dist-label' }
     );
     // animar la línea (SVG path)
     const lineEl = line.getElement();
@@ -657,6 +671,11 @@
   }
 
   // ── propagation panel ────────────────────────────────────
+  function scoreColor(ratio) {
+    const h = Math.max(0, Math.min(1, ratio)) * 120;
+    return `hsl(${h.toFixed(1)}, 72%, 55%)`;
+  }
+
   function updatePropPanel() {
     const fixedScore  = Object.values(stationData)
       .filter(s => s.status === 'ok')
@@ -666,6 +685,7 @@
 
     const hasData = Object.values(stationData).some(s => s.status === 'ok') || !!currentFurthest;
     const hasProp = score >= propThreshold;
+    const hasWarn = score >= propThreshold * 0.6;
     const pct     = propMaxScore > 0 ? Math.min((score / propMaxScore) * 100, 100) : 0;
     const thrPct  = propMaxScore > 0 ? (propThreshold / propMaxScore) * 100 : 0;
 
@@ -673,30 +693,32 @@
     document.getElementById('prop-bar-fill').style.width = `${pct}%`;
     document.getElementById('prop-bar-threshold').style.left = `${thrPct}%`;
 
-    const panel  = document.getElementById('prop-panel');
-    const dot    = document.getElementById('prop-dot');
-    const label  = document.getElementById('prop-label');
+    const panel   = document.getElementById('prop-panel');
+    const dot     = document.getElementById('prop-dot');
+    const label   = document.getElementById('prop-label');
     const scoreEl = document.getElementById('prop-score');
-    const fill   = document.getElementById('prop-bar-fill');
+    const fill    = document.getElementById('prop-bar-fill');
 
     if (!hasData) {
-      panel.className    = 'prop-panel';
-      dot.style.background = '#2a4a6a';
-      label.textContent  = 'Sin datos';
-      scoreEl.style.color = '#2a4a6a';
-      fill.style.background = '#2a4a6a';
-    } else if (hasProp) {
-      panel.className    = 'prop-panel status-ok';
-      dot.style.background = '#2ecc71';
-      label.textContent  = 'Propagación activa';
-      scoreEl.style.color = '#2ecc71';
-      fill.style.background = '#2ecc71';
+      panel.className       = 'prop-panel';
+      panel.style.borderColor = '';
+      dot.style.background  = '#4a6e90';
+      label.textContent     = 'Sin datos';
+      scoreEl.style.color   = '#4a6e90';
+      fill.style.background = '#4a6e90';
     } else {
-      panel.className    = 'prop-panel status-nok';
-      dot.style.background = '#e74c3c';
-      label.textContent  = 'Sin propagación';
-      scoreEl.style.color = '#e74c3c';
-      fill.style.background = '#e74c3c';
+      const ratio   = propThreshold > 0 ? Math.min(score / propThreshold, 1) : 0;
+      const dynColor = scoreColor(ratio);
+      const h        = ratio * 120;
+
+      panel.className       = `prop-panel status-${hasProp ? 'ok' : hasWarn ? 'warn' : 'nok'}`;
+      panel.style.borderColor = `hsla(${h.toFixed(1)}, 72%, 55%, 0.45)`;
+      dot.style.background  = dynColor;
+      scoreEl.style.color   = dynColor;
+      fill.style.background = dynColor;
+      label.textContent     = hasProp ? 'Propagación activa'
+                            : hasWarn ? 'Condiciones favorables'
+                            :           'Sin propagación';
     }
   }
 
@@ -868,15 +890,15 @@
 
     data.stations.forEach(s => {
       const mmsi = String(s.mmsi);
-      stationData[mmsi] = { ...s };
+      const dist = haversineKm(rx.lat, rx.lng, s.lat, s.lng);
+      stationData[mmsi] = { ...s, dist };
 
       const cfg  = STATUS_CFG[s.status] || STATUS_CFG.unknown;
-      const dist = haversineKm(rx.lat, rx.lng, s.lat, s.lng);
 
       // polyline
       const line = L.polyline([[rx.lat, rx.lng], [s.lat, s.lng]], {
         color: cfg.color, weight: 2, opacity: 0.8, dashArray: cfg.dash
-      }).addTo(map).bindTooltip(s.name, { sticky: true, className: 'map-tip' });
+      }).addTo(map).bindTooltip(`${dist.toFixed(0)} km`, { permanent: true, className: 'dist-label' });
 
       // station marker
       const marker = L.circleMarker([s.lat, s.lng], {
@@ -931,7 +953,6 @@
 
     // map
     mapLayers[mmsi].line.setStyle({ color: cfg.color, dashArray: null });
-    mapLayers[mmsi].line.setTooltipContent(`${s.name}<br>${signalPower.toFixed(1)} dBm`);
     mapLayers[mmsi].marker.setStyle({ fillColor: cfg.color, color: cfg.color });
 
     // card
