@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IR BIK: graneleros desde Irán al Río de la Plata — AIS Rio de la Plata</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0f1e;
+      color: #dce8f8;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    header {
+      border-bottom: 1px solid #1e3a5f;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .logo { font-size: 1.4rem; line-height: 1; text-decoration: none; }
+
+    .site-title a {
+      font-size: 0.85rem;
+      color: #7aaec8;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    .site-title a:hover { color: #7dd3fc; }
+
+    main {
+      margin: 3.5rem auto;
+      padding: 0 2rem;
+      max-width: 900px;
+    }
+
+    .post-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: #7aaec8;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #e8f4ff;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .post-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #7aaec8;
+      margin-bottom: 2rem;
+      letter-spacing: 0.06em;
+    }
+
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      color: #7dd3fc;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 3rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    h3 {
+      font-size: 1rem;
+      color: #c0d8f4;
+      font-weight: 600;
+      margin: 1.75rem 0 0.6rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #d0e4f6;
+      margin-bottom: 1rem;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    strong { color: #e8f4ff; font-weight: 600; }
+
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1e3a5f;
+      margin: 2.5rem 0;
+    }
+
+    /* ── toc ─────────────────────────────────────────── */
+    .toc {
+      border: 1px solid #1e3a5f;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 2.5rem;
+      display: inline-block;
+      min-width: 240px;
+    }
+
+    .toc-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7aaec8;
+      margin-bottom: 0.6rem;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-section;
+      margin: 0;
+      padding: 0;
+    }
+
+    .toc > ol > li {
+      counter-increment: toc-section;
+      margin-bottom: 0.25rem;
+    }
+
+    .toc > ol > li > a::before {
+      content: counter(toc-section) '. ';
+      font-family: 'JetBrains Mono', monospace;
+      color: #7aaec8;
+      font-size: 0.78rem;
+    }
+
+    .toc a {
+      font-size: 0.82rem;
+      color: #c0d6ea;
+      text-decoration: none;
+    }
+    .toc a:hover { color: #7dd3fc; }
+
+    /* ── callout ─────────────────────────────────────── */
+    .callout {
+      border-left: 3px solid #1e3a5f;
+      background: #0d1a2e;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .callout p {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      color: #bacce0;
+    }
+
+    .callout.warn {
+      border-left-color: #f39c12;
+    }
+    .callout.warn p { color: #c8a870; }
+
+    /* ── tables ──────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.88rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      background: #0d1a2e;
+      color: #7aaec8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid #0f1e35;
+      vertical-align: top;
+      line-height: 1.55;
+      color: #d0e4f6;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #7dd3fc;
+      white-space: nowrap;
+      font-size: 0.82rem;
+    }
+
+    .td-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #a8c8d8;
+      white-space: nowrap;
+    }
+
+    .td-dest {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+    }
+
+    /* ── transponder status ──────────────────────────── */
+    .ais-dark {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #f39c12;
+      background: rgba(243, 156, 18, 0.08);
+      border: 1px solid rgba(243, 156, 18, 0.25);
+      padding: 0.1em 0.45em;
+      white-space: nowrap;
+    }
+
+    /* ── timeline ────────────────────────────────────── */
+    .timeline {
+      position: relative;
+      padding-left: 1.75rem;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.3rem;
+      top: 0.5rem;
+      bottom: 0.5rem;
+      width: 1px;
+      background: #1e3a5f;
+    }
+
+    .tl-item {
+      position: relative;
+      padding-bottom: 1.25rem;
+    }
+    .tl-item:last-child { padding-bottom: 0; }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -1.45rem;
+      top: 0.42rem;
+      width: 0.5rem;
+      height: 0.5rem;
+      background: #1e3a5f;
+      border: 1px solid #7aaec8;
+      border-radius: 50%;
+    }
+
+    .tl-item.highlight::before {
+      background: #7dd3fc;
+      border-color: #7dd3fc;
+    }
+
+    .tl-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #7aaec8;
+      letter-spacing: 0.06em;
+      display: block;
+      margin-bottom: 0.1rem;
+    }
+
+    .tl-text {
+      font-size: 0.92rem;
+      color: #d0e4f6;
+      line-height: 1.5;
+    }
+    .tl-text strong { color: #e8f4ff; }
+
+    /* ── images ─────────────────────────────────────── */
+    .img-block { margin: 1.5rem 0; }
+
+    .img-block.half-right {
+      float: right;
+      width: 50%;
+      margin: 0 0 1.5rem 2rem;
+    }
+
+    .clearfix::after { content: ''; display: table; clear: both; }
+
+    .img-block img {
+      width: 100%;
+      display: block;
+      border: 1px solid #1e3a5f;
+    }
+
+    .gallery {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+    .gallery-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .img-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #7aaec8;
+      margin-top: 0.4rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── stats grid ──────────────────────────────────── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: #1e3a5f;
+      border: 1px solid #1e3a5f;
+      margin: 1.5rem 0;
+    }
+
+    .stat {
+      background: #0a0f1e;
+      padding: 1.1rem 1rem;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      color: #7dd3fc;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #7aaec8;
+    }
+
+    /* ── post footer ─────────────────────────────────── */
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1e3a5f;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #7aaec8;
+      line-height: 2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #4a6e90;
+      font-size: 0.72rem;
+    }
+
+    footer a { color: #7aaec8; text-decoration: none; }
+    footer a:hover { color: #7dd3fc; }
+
+    @media (max-width: 600px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 1.8rem; }
+      table { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="../../">⚓📡</a>
+  <div class="site-title">
+    <a href="../../">AIS · Rio de la Plata</a>
+  </div>
+</header>
+
+<main>
+
+  <p class="post-meta">Publicación #04</p>
+  <h1>IR BIK: graneleros desde Irán al Río de la Plata</h1>
+  <p class="post-date">6 de mayo de 2026</p>
+
+  <div class="toc">
+    <p class="toc-title">Índice</p>
+    <ol>
+      <li><a href="#andermatt">El ANDERMATT</a></li>
+      <li><a href="#flota">La flota: cruces del Estrecho de Ormuz</a></li>
+      <li><a href="#casos">Otros casos destacados</a></li>
+      <li><a href="#destinos">Análisis de destinos</a></li>
+      <li><a href="#conclusiones">Conclusiones</a></li>
+      <li><a href="#datos">Datos</a></li>
+    </ol>
+  </div>
+
+  <div class="clearfix">
+    <div class="img-block half-right" style="width:38%;">
+      <img src="ais-iran-bik_map.png" alt="Mapa de posiciones AIS — flota BIK al Cono Sur">
+    </div>
+
+  <p>El 1 de mayo de 2026 llegaron al fondeadero de Recalada (frente a Montevideo) los primeros paquetes AIS del <strong>ANDERMATT</strong>, un granelero que había partido de <strong>Bandar Imam Khomeini (BIK)</strong>, el principal puerto de exportación de Irán sobre el Golfo Pérsico, 38 días antes. Su llegada abrió una ventana hacia un flujo de tráfico de graneleros que atravesaron el Estrecho de Ormuz con destino al Cono Sur para carga en Argentina, Uruguay y Brasil.</p>
+
+  </div><!-- /.clearfix intro -->
+
+  <!-- ── El ANDERMATT ─────────────────────────────── -->
+  <h2 id="andermatt">El ANDERMATT</h2>
+
+  <div class="clearfix">
+    <div class="img-block half-right">
+      <img src="andermatt.png" alt="ANDERMATT con remolcador en maniobras">
+      <p class="img-caption">ANDERMATT en maniobras · © ruud coster / MarineTraffic</p>
+    </div>
+
+  <p>El ANDERMATT, navega con bandera de Liberia 🇱🇷 MMSI:636022943 IMO:9738791 Callsign:5LLE4, fue el primero que recibi asi que es el que mas datos estuve obteniendo, como para tener un ejemplo de un barco con estas caracteristicas.</p>
+
+    <h3>Línea de tiempo del viaje</h3>
+
+  <div class="timeline">
+    <div class="tl-item highlight">
+      <span class="tl-date">2026-03-23 19:26 · UTC+4.5</span>
+      <div class="tl-text"><strong>Partida de Bandar Imam Khomeini (BIK)</strong>, Irán 🇮🇷.</div>
+    </div>
+    <div class="tl-item">
+      <span class="tl-date">2026-03-25 a 2026-03-31</span>
+      <div class="tl-text">Fondeado / drifting en el <strong>Golfo Pérsico</strong> durante ~5 días, cerca del Estrecho de Ormuz.</div>
+    </div>
+    <div class="tl-item highlight">
+      <span class="tl-date">2026-03-31 10:32 · UTC+4</span>
+      <div class="tl-text"><strong>Cruce del Estrecho de Ormuz.</strong></div>
+    </div>
+    <div class="tl-item">
+      <span class="tl-date">2026-04-01</span>
+      <div class="tl-text">Parada técnica en <strong>Fujairah</strong> (Emiratos Árabes Unidos 🇦🇪), ~1.5 días.</div>
+    </div>
+    <div class="tl-item">
+      <span class="tl-date">2026-04-13 04:30 · UTC+2</span>
+      <div class="tl-text">Cruce del <strong>Canal de Mozambique</strong>.</div>
+    </div>
+    <div class="tl-item">
+      <span class="tl-date">2026-04-16 21:48 · UTC+1</span>
+      <div class="tl-text">Paso por el <strong>Cabo de Buena Esperanza</strong>, Sudáfrica 🇿🇦.</div>
+    </div>
+    <div class="tl-item highlight">
+      <span class="tl-date">2026-05-01 09:27 · UTC−3</span>
+      <div class="tl-text"><strong>Llegada a Recalada</strong> (frente a Montevideo, Uruguay 🇺🇾). Duración total: <strong>38 días y 21 horas</strong>.</div>
+    </div>
+  </div>
+
+  </div><!-- /.clearfix -->
+
+  <h3>Carga en San Lorenzo (Renova Sur)</h3>
+
+  <p>Tras fondear en Recalada, el ANDERMATT subió el Río de la Plata hasta <strong>San Lorenzo</strong> para cargar subproductos oleaginosos entre el 2 y el 8 de mayo, con fecha de zarpe el 9 de mayo rumbo al Golfo Árabe.</p>
+
+  <div class="img-block">
+    <img src="andermatt_mapa_entrando_sanlorenzo.png" alt="Track del ANDERMATT entrando al Río de la Plata y subiendo el Paraná hasta San Lorenzo">
+    <p class="img-caption">Track AIS del ANDERMATT: llegada por el Río de la Plata (azul) y ascenso por el Paraná hasta San Lorenzo (naranja).</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cantidad (t)</th>
+        <th>Destino</th>
+        <th>Empresa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>SHULLS <span style="font-family:inherit;font-size:0.8em;color:#7aaec8;">(pellets girasol)</span></td>
+        <td class="td-date">1.860</td>
+        <td>Jordania 🇯🇴</td>
+        <td class="td-date">YPF</td>
+      </tr>
+      <tr>
+        <td>SBM <span style="font-family:inherit;font-size:0.8em;color:#7aaec8;">(harina de soja)</span></td>
+        <td class="td-date">17.600</td>
+        <td>Arabia Saudita 🇸🇦</td>
+        <td class="td-date">BUNGE</td>
+      </tr>
+      <tr>
+        <td>SBM <span style="font-family:inherit;font-size:0.8em;color:#7aaec8;">(harina de soja)</span></td>
+        <td class="td-date">17.600</td>
+        <td>Jordania 🇯🇴</td>
+        <td class="td-date">BUNGE</td>
+      </tr>
+      <tr>
+        <td>SHULLS <span style="font-family:inherit;font-size:0.8em;color:#7aaec8;">(pellets girasol)</span></td>
+        <td class="td-date">6.940</td>
+        <td>Jordania 🇯🇴</td>
+        <td class="td-date">BUNGE</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Total embarcado: <strong>~44.000 toneladas</strong>.
+  <!-- ── La flota ──────────────────────────────────── -->
+  <h2 id="flota">La flota: cruces del Estrecho de Ormuz</h2>
+
+  <div class="img-block">
+    <img src="ais-iran-bik_map.png" alt="Mapa de posiciones AIS — flota BIK al Cono Sur">
+    <p class="img-caption">Posiciones AIS de la flota BIK → Cono Sur (marzo–abril 2026). Puntos verdes: señales recibidas a lo largo de la ruta.</p>
+  </div>
+
+  <p>Entre el 31 de marzo y el 27 de abril de 2026 se registraron <strong>17 barcos</strong> cruzando el Estrecho de Ormuz desde el Golfo Pérsico con destino al Cono Sur. El flujo fue continuo — un cruce cada 1 a 3 días — sin interrupciones evidentes durante todo el período.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Barco</th>
+        <th>Cruce Estrecho de Ormuz</th>
+        <th>Destino</th>
+        <th>Transponder</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ANDERMATT</td>
+        <td class="td-date">2026-03-31</td>
+        <td class="td-dest">🇺🇾 RECALADA</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>MINOAN GLORY</td>
+        <td class="td-date">2026-04-01</td>
+        <td class="td-dest">🇺🇾 RECALADA</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>JUN YUAN</td>
+        <td class="td-date">2026-04-01</td>
+        <td class="td-dest">🇺🇾 RECALADA</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>CHRISTINA V</td>
+        <td class="td-date">2026-04-02 03:35–12:28</td>
+        <td class="td-dest">🇺🇾 RECALADA</td>
+        <td><span class="ais-dark">AIS apagado múltiples veces</span></td>
+      </tr>
+      <tr>
+        <td>STARDUST</td>
+        <td class="td-date">2026-04-02</td>
+        <td class="td-dest">🇺🇾 Nueva Palmira</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>GIACOMETTI</td>
+        <td class="td-date">2026-04-04</td>
+        <td class="td-dest">🇧🇷 Rio Grande</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>SAINT MYRON</td>
+        <td class="td-date">2026-04-06</td>
+        <td class="td-dest">🇧🇷 Salvador</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>IOLCOS DESTINY</td>
+        <td class="td-date">2026-04-08</td>
+        <td class="td-dest">🇺🇾 RECALADA</td>
+        <td><span class="ais-dark">AIS apagado antes de cruzar</span></td>
+      </tr>
+      <tr>
+        <td>NEW AMBITION</td>
+        <td class="td-date">2026-04-08</td>
+        <td class="td-dest">🇺🇾 RECALADA</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>GENEVE</td>
+        <td class="td-date">2026-04-12</td>
+        <td class="td-dest">🇧🇷 Santos</td>
+        <td><span class="ais-dark">AIS apagado 11 ABR</span></td>
+      </tr>
+      <tr>
+        <td>CHRISTIANNA</td>
+        <td class="td-date">2026-04-13</td>
+        <td class="td-dest">🇧🇷 Santos</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>BASEL</td>
+        <td class="td-date">2026-04-17</td>
+        <td class="td-dest">🇧🇷 Santos</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>CECI</td>
+        <td class="td-date">2026-04-17</td>
+        <td class="td-dest">🇧🇷 Santos</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>ASCANIO</td>
+        <td class="td-date">2026-04-22</td>
+        <td class="td-dest">🇧🇷 Rio Grande</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>LB ENERGY</td>
+        <td class="td-date">2026-04-23</td>
+        <td class="td-dest">🇧🇷 Paranaguá</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>STAR LAURA</td>
+        <td class="td-date">2026-04-27</td>
+        <td class="td-dest">🇧🇷 Santos</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── Casos destacados ──────────────────────────── -->
+  <h2 id="casos">Otros casos destacados</h2>
+
+  <h3>LAGUNA SECA — período oscuro prolongado</h3>
+  <p>El LAGUNA SECA partió de BIK el <strong>13 de marzo</strong>, apagó el transponder el 19 de marzo, y reapareció ya en el océano Índico recién el <strong>10 de abril</strong> — más de tres semanas oscuro en la zona más vigilada del planeta. El cruce del Estrecho de Ormuz ocurrió en algún momento durante ese período oscuro. Su destino era Recalada.</p>
+
+  <h3>PELAGIA — intento de cruce fallido desde Latinoamerica por el estrecho en febrero</h3>
+  <p>El PELAGIA (IMO 9433626) intentó cruzar el Estrecho de Ormuz en febrero de 2026, apagó el transponder, y <strong>"rebotó"</strong> — volvió hacia adentro del Golfo Pérsico. Reapareció el 11 de marzo en <strong>Chabahar</strong> (puerto iraní 🇮🇷 sobre el Mar de Omán, fuera del Golfo) y retomó la ruta hacia América Latina con destino a Nueva Palmira. Es el único caso de intento fallido registrado en el período.</p>
+
+<p>⚠️ Otra curiosidad del PELAGIA: omitio en su declaraion a la ANP mencionar a <strong>Chabahar 🇮🇷</strong> en sus "Puertos anteriores" y para ese periodo (06/03/26) dice que estuvo en ARACAJU BRAZIL 🇧🇷 lo cual es falso.</p>
+
+  <div class="gallery gallery-2">
+    <div class="img-block" style="margin:0">
+      <img src="pelagia_anp-arribos.png" alt="ANP consulta de arribos del PELAGIA — Chabahar omitido">
+      <p class="img-caption">ANP · Consulta de arribos: el PELAGIA declara ARACAJU 🇧🇷 el 06/03/26 — Chabahar 🇮🇷 no figura.</p>
+    </div>
+    <div class="img-block" style="margin:0">
+      <img src="pelagia_03mar-ormuz.png" alt="Track AIS del PELAGIA — rebote en el Estrecho de Ormuz">
+      <p class="img-caption">MarineTraffic · Track AIS del PELAGIA: la línea roja discontinua muestra el rebote en el Estrecho de Ormuz antes de retornar a Chabahar.</p>
+    </div>
+  </div>
+
+  <!-- ── Destinos ───────────────────────────────────── -->
+  <h2 id="destinos">Análisis de destinos</h2>
+
+  <div class="stat-grid">
+    <div class="stat">
+      <div class="stat-num">🚢</div>
+      <div class="stat-label">18 barcos</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">🇺🇾</div>
+      <div class="stat-label">9 Uruguay</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">🇧🇷</div>
+      <div class="stat-label">9 Brasil</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">🇦🇷</div>
+      <div class="stat-label">7 Argentina (est.)</div>
+    </div>
+  </div>
+
+  <p>🇺🇾 Uruguay y 🇧🇷 Brasil reciben la misma cantidad de barcos. Si bien algunos figuran como destino 🇺🇾 Uruguay, muchos van a ir a 🇦🇷 Argentina y tienen que pasar por RECALADA.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Puerto</th>
+        <th>País</th>
+        <th>Barcos</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Recalada (Montevideo)</td>
+        <td>🇺🇾 Uruguay</td>
+        <td>ANDERMATT, CHRISTINA V, MINOAN GLORY, NEW AMBITION, LAGUNA SECA, IOLCOS DESTINY, JUN YUAN <strong style="color:#7dd3fc">(7)</strong></td>
+      </tr>
+      <tr>
+        <td>Nueva Palmira</td>
+        <td>🇺🇾 Uruguay</td>
+        <td>STARDUST, PELAGIA <strong style="color:#7dd3fc">(2)</strong></td>
+      </tr>
+      <tr>
+        <td>Santos</td>
+        <td>🇧🇷 Brasil</td>
+        <td>GENEVE, CHRISTIANNA, BASEL, CECI, STAR LAURA <strong style="color:#7dd3fc">(5)</strong></td>
+      </tr>
+      <tr>
+        <td>Rio Grande</td>
+        <td>🇧🇷 Brasil</td>
+        <td>GIACOMETTI, ASCANIO <strong style="color:#7dd3fc">(2)</strong></td>
+      </tr>
+      <tr>
+        <td>Salvador (Bahia)</td>
+        <td>🇧🇷 Brasil</td>
+        <td>SAINT MYRON <strong style="color:#7dd3fc">(1)</strong></td>
+      </tr>
+      <tr>
+        <td>Paranaguá</td>
+        <td>🇧🇷 Brasil</td>
+        <td>LB ENERGY <strong style="color:#7dd3fc">(1)</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>La concentración de llegadas en <strong>marzo–mayo</strong> sera por algun ciclo de cosechas que activa la demanda de fletes de graneleros?</p>
+
+
+<h2 id="conclusiones">Conclusiones</h2>
+  
+  <p>Pocas 🙃</p>
+
+  <p>El flujo continuo de cruces entre el 31 de marzo y el 27 de abril de 2026 — sin brechas evidentes — indica que <strong>el Estrecho de Ormuz permaneció operativo durante todo el período</strong>. No hay señal de cierre ni bloqueo.</p>
+
+  <p>Sin embargo, el patrón de <strong>dark shipping</strong> estuvo presente: algunos de los barcos apagaron el transponder en algún punto del tránsito por el Golfo Pérsico o el Estrecho. Esta conducta es consistente con la evasión de bases de datos de <em>compliance</em> de sanciones: los armadores prefieren minimizar la huella AIS.</p>
+
+  <p>El caso más llamativo es el intento fallido del <strong>PELAGIA</strong> en febrero. La combinación de acercamiento al Estrecho, apagado de transponder y retorno al interior del Golfo sugiere algún obstáculo operativo —ya sea mayor vigilancia naval, una instrucción del armador, o un problema de despacho portuario— en ese mes específico.</p>
+
+  <h2 id="datos">Datos</h2>
+
+  <table>
+    <thead>
+      <tr><th>Archivo</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="04-ir-bik.md">04-ir-bik.md</a></td>
+        <td>Notas y análisis en texto plano — fuente de este artículo</td>
+      </tr>
+      <tr>
+        <td><a href="ais-iran-bik_map.png">ais-iran-bik_map.png</a></td>
+        <td>Mapa de posiciones AIS — flota BIK → Cono Sur (marzo–abril 2026)</td>
+      </tr>
+      <tr>
+        <td><a href="andermatt.png">andermatt.png</a></td>
+        <td>Fotografía del ANDERMATT en maniobras · © ruud coster / MarineTraffic</td>
+      </tr>
+      <tr>
+        <td><a href="andermatt_mapa_entrando_sanlorenzo.png">andermatt_mapa_entrando_sanlorenzo.png</a></td>
+        <td>Track AIS del ANDERMATT entrando al Río de la Plata y subiendo el Paraná hasta San Lorenzo</td>
+      </tr>
+      <tr>
+        <td><a href="pelagia_03mar-ormuz.png">pelagia_03mar-ormuz.png</a></td>
+        <td>Track AIS del PELAGIA — rebote en el Estrecho de Ormuz (MarineTraffic, 06 MAR 2026)</td>
+      </tr>
+      <tr>
+        <td><a href="pelagia_anp-arribos.png">pelagia_anp-arribos.png</a></td>
+        <td>ANP · Consulta de arribos del PELAGIA — Chabahar omitido, figura ARACAJU en su lugar</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="post-footer">
+    <p>Por: LU1AAT / CX9CAT &nbsp;·&nbsp; <a href="../../">AIS Rio de la Plata</a></p>
+    <p>Datos: AIS capturado localmente · MarineTraffic</p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="../../">← Volver al inicio</a>
+</footer>
+
+</body>
+</html>
