@@ -1,7 +1,7 @@
 {
   "updated": null,
   "propagation_threshold": 50,
-  "pts_per_km": 0.2,
+  "pts_per_km": 0.3,
   "rx": {
     "name": "BUCEO",
     "lat": -34.897952,
@@ -23,7 +23,7 @@
       "name": "⚓ Faro Punta Piedras",
       "lat": -35.379520,
       "lng": -57.160439,
-      "score": 50,
+      "score": 30,
       "status": "unknown",
       "last_heard": null,
       "level_db": null
