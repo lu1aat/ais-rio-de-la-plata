@@ -22,12 +22,13 @@ Serving via HTTP (not `file://`) is required because posts use `fetch()` to load
 ```
 index.html                        # Homepage — list of all posts
 posts/
-  NN-slug/
+  NN-slug/                        # Published post (numbered sequentially)
     index.html                    # Post content (self-contained)
     *.csv / *.geojson / *.png     # Data and media for that post
+  XX-slug/                        # Draft / unpublished post (not in index)
 ```
 
-Each post directory is numbered sequentially (`01-`, `02-`, …). The homepage `index.html` must be updated manually when adding a new post.
+Published post directories are numbered sequentially (`01-`, `02-`, …) and linked from the homepage `index.html`. Drafts and work-in-progress posts use the `XX-` prefix and are **not** added to the index until promoted to a numbered post.
 
 ## Design system
 
