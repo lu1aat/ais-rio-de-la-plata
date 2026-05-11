@@ -26,23 +26,91 @@
     .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
     header {
+      position: relative;
       border-bottom: 1px solid #1e3a5f;
       padding: 1.25rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-family: 'JetBrains Mono', monospace;
+      background: #060b15;
+      overflow: hidden;
     }
 
-    .logo { font-size: 1.4rem; line-height: 1; text-decoration: none; }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(125, 211, 252, 0.0) 20%,
+        rgba(125, 211, 252, 0.55) 50%,
+        rgba(125, 211, 252, 0.0) 80%,
+        transparent 100%
+      );
+      animation: header-scan 5s ease-in-out infinite;
+    }
 
-    .site-title a {
+    @keyframes header-scan {
+      0%, 100% { opacity: 0.15; }
+      50%       { opacity: 1; }
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .header-badge {
+      position: relative;
+      width: 2.4rem;
+      height: 2.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .badge-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      animation: ring-pulse 3.5s ease-out infinite;
+    }
+
+    .badge-ring::after {
+      content: '';
+      position: absolute;
+      inset: -7px;
+      border-radius: 50%;
+      border: 1px solid rgba(125, 211, 252, 0.08);
+      animation: ring-pulse 3.5s ease-out 0.9s infinite;
+    }
+
+    @keyframes ring-pulse {
+      0%  { transform: scale(0.92); opacity: 0.8; }
+      70% { transform: scale(1.3);  opacity: 0; }
+      100%{ transform: scale(1.3);  opacity: 0; }
+    }
+
+    .badge-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .site-identity a {
       font-size: 0.85rem;
       color: #7aaec8;
       text-decoration: none;
       letter-spacing: 0.04em;
+      font-family: 'JetBrains Mono', monospace;
     }
-    .site-title a:hover { color: #7dd3fc; }
+
+    .site-identity a:hover { color: #7dd3fc; }
 
     main {
       margin: 3.5rem auto;
@@ -475,9 +543,14 @@
 <body>
 
 <header>
-  <a class="logo" href="../../">⚓📡</a>
-  <div class="site-title">
-    <a href="../../">AIS · Rio de la Plata</a>
+  <div class="header-inner">
+    <a class="header-badge" href="../../">
+      <span class="badge-ring"></span>
+      <span class="badge-icon">⚓</span>
+    </a>
+    <div class="site-identity">
+      <a href="../../">AIS · Río de la Plata</a>
+    </div>
   </div>
 </header>
 

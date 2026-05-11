@@ -18,29 +18,132 @@
     }
 
     header {
+      position: relative;
       border-bottom: 1px solid #1e3a5f;
-      padding: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      padding: 1.5rem 2rem;
+      background: #060b15;
+      overflow: hidden;
     }
 
-    .logo { font-size: 2.5rem; line-height: 1; }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(125, 211, 252, 0.0) 20%,
+        rgba(125, 211, 252, 0.55) 50%,
+        rgba(125, 211, 252, 0.0) 80%,
+        transparent 100%
+      );
+      animation: header-scan 5s ease-in-out infinite;
+    }
 
-    .site-title h1 {
+    @keyframes header-scan {
+      0%, 100% { opacity: 0.15; }
+      50%       { opacity: 1; }
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      max-width: 80%;
+      margin: 0 auto;
+    }
+
+    .header-badge {
+      position: relative;
+      width: 2.8rem;
+      height: 2.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .badge-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      animation: ring-pulse 3.5s ease-out infinite;
+    }
+
+    .badge-ring::after {
+      content: '';
+      position: absolute;
+      inset: -7px;
+      border-radius: 50%;
+      border: 1px solid rgba(125, 211, 252, 0.08);
+      animation: ring-pulse 3.5s ease-out 0.9s infinite;
+    }
+
+    @keyframes ring-pulse {
+      0%  { transform: scale(0.92); opacity: 0.8; }
+      70% { transform: scale(1.3);  opacity: 0; }
+      100%{ transform: scale(1.3);  opacity: 0; }
+    }
+
+    .badge-icon {
+      font-size: 1.3rem;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .site-identity { flex: 1; }
+
+    .site-identity h1 {
       font-size: 1.4rem;
       font-weight: 700;
       color: #7dd3fc;
       letter-spacing: 0.01em;
     }
 
-    .site-title p {
-      font-size: 0.8rem;
-      color: #7aaec8;
-      margin-top: 0.2rem;
+    .site-identity p {
+      font-size: 0.78rem;
+      color: #5a8aaa;
+      margin-top: 0.25rem;
       font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
+
+    .header-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.3rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-rx {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      color: #3dba77;
+      text-transform: uppercase;
+    }
+
+    .rx-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #3dba77;
+      box-shadow: 0 0 5px rgba(61, 186, 119, 0.7);
+      animation: rx-blink 2.5s ease-in-out infinite;
+    }
+
+    @keyframes rx-blink {
+      0%, 100% { opacity: 1; box-shadow: 0 0 5px rgba(61, 186, 119, 0.7); }
+      50%       { opacity: 0.3; box-shadow: none; }
+    }
+
 
     main {
       margin: 3rem auto;
@@ -165,10 +268,21 @@
 <body>
 
 <header>
-  <div class="logo">⚓📡</div>
-  <div class="site-title">
-    <h1>AIS · Rio de la Plata</h1>
-    <p>Radio y Actividad maritima · Datos y analisis</p>
+  <div class="header-inner">
+    <div class="header-badge">
+      <span class="badge-ring"></span>
+      <span class="badge-icon">⚓</span>
+    </div>
+    <div class="site-identity">
+      <h1>AIS · Río de la Plata</h1>
+      <p>Radio y actividad marítima · Datos y análisis</p>
+    </div>
+    <div class="header-status">
+      <span class="status-rx">
+        <span class="rx-dot"></span>
+        AIS·RX
+      </span>
+    </div>
   </div>
 </header>
 
