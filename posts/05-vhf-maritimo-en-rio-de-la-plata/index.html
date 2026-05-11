@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VHF marítimo en el Río de la Plata — AIS Rio de la Plata</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0f1e;
+      color: #dce8f8;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    header {
+      border-bottom: 1px solid #1e3a5f;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .logo { font-size: 1.4rem; line-height: 1; text-decoration: none; }
+
+    .site-title a {
+      font-size: 0.85rem;
+      color: #7aaec8;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    .site-title a:hover { color: #7dd3fc; }
+
+    main {
+      margin: 3.5rem auto;
+      padding: 0 2rem;
+      max-width: 980px;
+    }
+
+    .post-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: #7aaec8;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #e8f4ff;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .post-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #7aaec8;
+      margin-bottom: 2rem;
+      letter-spacing: 0.06em;
+    }
+
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      color: #7dd3fc;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 3rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    h3 {
+      font-size: 1rem;
+      color: #c0d8f4;
+      font-weight: 600;
+      margin: 1.75rem 0 0.6rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #d0e4f6;
+      margin-bottom: 1rem;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    strong { color: #e8f4ff; font-weight: 600; }
+
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1e3a5f;
+      margin: 2.5rem 0;
+    }
+
+    /* ── toc ─────────────────────────────────────────── */
+    .toc {
+      border: 1px solid #1e3a5f;
+      padding: 0.9rem 1.1rem;
+      margin: 0 0 1.5rem 2rem;
+      float: right;
+      min-width: 260px;
+    }
+
+    .toc-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7aaec8;
+      margin-bottom: 0.6rem;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-section;
+      margin: 0;
+      padding: 0;
+    }
+
+    .toc > ol > li {
+      counter-increment: toc-section;
+      margin-bottom: 0.25rem;
+    }
+
+    .toc > ol > li > a::before {
+      content: counter(toc-section) '. ';
+      font-family: 'JetBrains Mono', monospace;
+      color: #7aaec8;
+      font-size: 0.78rem;
+    }
+
+    .toc a {
+      font-size: 0.82rem;
+      color: #c0d6ea;
+      text-decoration: none;
+    }
+    .toc a:hover { color: #7dd3fc; }
+
+    /* ── callout ─────────────────────────────────────── */
+    .callout {
+      border-left: 3px solid #1e3a5f;
+      background: #0d1a2e;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .callout p {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      color: #bacce0;
+    }
+
+    .callout.warn {
+      border-left-color: #f39c12;
+    }
+    .callout.warn p { color: #c8a870; }
+
+    .callout.alert {
+      border-left-color: #e74c3c;
+      background: #1a0d10;
+    }
+    .callout.alert p { color: #d08090; }
+
+    /* ── tables ──────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.88rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      background: #0d1a2e;
+      color: #7aaec8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid #0f1e35;
+      vertical-align: top;
+      line-height: 1.55;
+      color: #d0e4f6;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #7dd3fc;
+      white-space: nowrap;
+    }
+
+    td.muted {
+      color: #7aaec8;
+      font-size: 0.82rem;
+    }
+
+    /* ── canal cards ─────────────────────────────────── */
+    .canal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .canal-card {
+      border: 1px solid #1e3a5f;
+      background: #0d1a2e;
+      padding: 1rem 1.2rem;
+    }
+
+    .canal-card .freq {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #7aaec8;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.25rem;
+    }
+
+    .canal-card .ch-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
+      color: #7dd3fc;
+      font-weight: bold;
+      margin-bottom: 0.4rem;
+    }
+
+    .canal-card .ch-role {
+      font-size: 0.7rem;
+      color: #4a7a9b;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .canal-card .ch-desc {
+      font-size: 0.82rem;
+      color: #bacce0;
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+
+    .canal-card .ch-stat {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #4a7a9b;
+      letter-spacing: 0.04em;
+    }
+
+    .canal-card.ch16 { border-color: #e74c3c33; }
+    .canal-card.ch16 .ch-name { color: #e74c3c; }
+
+    .canal-card.ch-pilot { border-color: #2ecc7133; }
+    .canal-card.ch-pilot .ch-name { color: #2ecc71; }
+
+    /* ── quote blocks ─────────────────────────────────── */
+    .quote-block {
+      border-left: 3px solid #7dd3fc33;
+      padding: 0.7rem 1.1rem;
+      margin: 1rem 0;
+      background: #0a1525;
+    }
+
+    .quote-block p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #9abfd8;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .quote-block .q-source {
+      font-size: 0.68rem;
+      color: #4a7a9b;
+      margin-top: 0.4rem;
+      display: block;
+    }
+
+    /* ── incident blocks ─────────────────────────────── */
+    .incident {
+      border: 1px solid #2a1f10;
+      background: #110d07;
+      padding: 1.1rem 1.3rem;
+      margin: 1.5rem 0;
+    }
+
+    .incident-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .incident-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+    }
+
+    .incident-label.urgencia { background: #3a0d10; color: #e74c3c; }
+    .incident-label.anomalia { background: #2a1a05; color: #f39c12; }
+    .incident-label.curiosidad { background: #0d1a2e; color: #7aaec8; }
+    .incident-label.cierre { background: #1a1a0d; color: #e6c84a; }
+
+    .incident-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #4a7a9b;
+    }
+
+    .incident h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      color: #d8e8f4;
+    }
+
+    .incident p {
+      font-size: 0.88rem;
+      color: #b0c4d8;
+      margin-bottom: 0.6rem;
+    }
+
+    .incident .audio-ref {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #3a6a8a;
+      display: block;
+      margin-top: 0.3rem;
+    }
+
+    /* ── flow diagram ─────────────────────────────────── */
+    .flow-diagram {
+      background: #060c18;
+      border: 1px solid #1e3a5f;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+
+    .flow-diagram .fl-main { color: #7dd3fc; }
+    .flow-diagram .fl-secondary { color: #7aaec8; }
+    .flow-diagram .fl-dim { color: #4a7a9b; }
+
+    /* ── entities table ───────────────────────────────── */
+    .entity-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      background: #0d1a2e;
+      border: 1px solid #1e3a5f;
+      color: #7dd3fc;
+      padding: 0.1rem 0.45rem;
+      margin-right: 0.25rem;
+      margin-bottom: 0.2rem;
+    }
+
+    /* ── freq spectrum vis ───────────────────────────── */
+    .freq-vis { margin: 1.5rem 0; }
+    .freq-labels {
+      position: relative;
+      height: 1.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: #7aaec8;
+      letter-spacing: 0.05em;
+    }
+    .freq-label {
+      position: absolute;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .freq-label.marine { color: #7dd3fc; }
+    .freq-track {
+      position: relative;
+      height: 22px;
+      background: #060c18;
+      border: 1px solid #1e3a5f;
+    }
+    .freq-seg { position: absolute; top: 0; height: 100%; }
+    .freq-axis {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.3rem;
+      border-top: 1px solid #1e3a5f;
+      padding-top: 0.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      color: #4a7a9b;
+    }
+
+    /* ── audio player ────────────────────────────────── */
+    .quote-block audio {
+      display: block;
+      margin-top: 0.6rem;
+      width: 100%;
+      height: 28px;
+      filter: invert(1) hue-rotate(180deg) brightness(0.7);
+      opacity: 0.8;
+    }
+    .quote-block audio:hover { opacity: 1; }
+
+    /* ── post footer ─────────────────────────────────── */
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1e3a5f;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #7aaec8;
+      line-height: 2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #4a6e90;
+      font-size: 0.72rem;
+    }
+
+    footer a { color: #7aaec8; text-decoration: none; }
+    footer a:hover { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">⚓</span>
+  <div class="site-title">
+    <a href="../../index.html">AIS Río de la Plata</a>
+  </div>
+</header>
+
+<main>
+
+  <div class="post-meta">Radiocomunicaciones marítimas</div>
+  <h1>VHF marítimo en el Río de la Plata</h1>
+  <div class="post-date">Mayo 2026 &nbsp;·&nbsp; LU1AAT / CX9CAT</div>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ol>
+      <li><a href="#vhf-maritimo">El VHF marítimo</a></li>
+      <li><a href="#receptor">El receptor</a></li>
+      <li><a href="#canales">Los canales monitoreados</a></li>
+      <li><a href="#ch16">CH16 — El canal de todos</a></li>
+      <li><a href="#practicaje">CH77, CH74, CH73 — Practicaje</a></li>
+      <li><a href="#portcontrol">CH12 y CH13 — Port Control</a></li>
+      <li><a href="#incidentes">Eventos</a></li>
+      <li><a href="#datos">Datos</a></li>
+    </ol>
+  </div>
+
+  <p>
+    Los buques que navegan el Río de la Plata y acceden a los puertos de Montevideo, Buenos Aires
+    y los puertos fluviales de Argentina usan una serie de frecuencias repartidas en canales VHF que ya vienen definidos en los equipos nauticos/maritimos.</p>
+    
+    <p>Con un receptor y pequena antena interior por Montevideo, monitoreamos estos canales
+    y transcribimos automáticamente el audio.</p>
+    
+
+
+  <h2 id="vhf-maritimo">El VHF marítimo</h2>
+
+  <p>
+    La banda VHF marítima ocupa de 156 a 174 MHz. Cada canal tiene 25 kHz de ancho de banda y un
+    número de canal estandarizado a nivel mundial.
+  </p>
+
+  <div class="freq-vis">
+    <div class="freq-labels">
+      <span class="freq-label" style="left:17.75%">FM · 88–108</span>
+      <span class="freq-label" style="left:47%">Airband · 118–136</span>
+      <span class="freq-label" style="left:66%">Amateur 2m · 144–148</span>
+      <span class="freq-label marine" style="left:85%">VHF Marine · 156–174</span>
+    </div>
+    <div class="freq-track">
+      <div class="freq-seg" style="left:7.5%; width:20.5%; background:rgba(74,122,155,0.35);"></div>
+      <div class="freq-seg" style="left:38%;  width:18%;   background:rgba(80,150,120,0.25);"></div>
+      <div class="freq-seg" style="left:64%;  width:4%;    background:rgba(120,80,180,0.35);"></div>
+      <div class="freq-seg" style="left:76%;  width:18%;   background:rgba(125,211,252,0.2); border-left:2px solid rgba(125,211,252,0.45); border-right:2px solid rgba(125,211,252,0.45);"></div>
+    </div>
+    <div class="freq-axis">
+      <span>80</span><span>100</span><span>120</span><span>140</span><span>160</span><span>180 MHz</span>
+    </div>
+  </div>
+
+  <p>
+     A diferencia de la radio aficionada, esta organizada en canales que tienen usos asignados: hay canales de emergencia, de puertos, de practicaje,
+    de embarcaciones menores.
+  </p>
+
+
+  <h2 id="receptor">El receptor</h2>
+
+  <p>
+    El hardware es un <strong>RTL-SDR</strong> — un USB de 30 dolares diseñado
+    originalmente para recibir televisión digital terrestre (DVB-T) y una antena que viene incluida en el kit: no pensado para para VHF marítimo. No está optimizada para 156–174 MHz ni orientada correctamente.
+  </p>
+
+  <p>
+    Está apoyada sobre una repisa en el interior de un apartamento en Montevideo, con vista
+    al Río de la Plata. Sin mástil, sin plano de tierra, sin línea de visión directa al exterior.
+  </p>
+
+  <h2 id="canales">Los canales monitoreados</h2>
+
+  <p>
+    Informacion extraida de audios decodificados entre abril y mayo 2026:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Canal</th>
+        <th>Frecuencia</th>
+        <th>Uso principal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CH11</td>
+        <td class="muted">156.550 MHz</td>
+        <td>🇺🇾 Puerto de Montevideo — maniobras de atraque y servicios en muelle.</td>
+      </tr>
+      <tr>
+        <td>CH12</td>
+        <td class="muted">156.600 MHz</td>
+        <td>🇦🇷 L2G (_Lima dos Golf_) estación costera de la Prefectura Naval Argentina (PNA) — Registro de arribo, datos de buques y coordinación.</td>
+      </tr>
+      <tr>
+        <td>CH13</td>
+        <td class="muted">156.650 MHz</td>
+        <td>🇺🇾 Montevideo Port Control (VTS)</td>
+      </tr>
+        <td>CH16</td>
+        <td class="muted">156.800 MHz</td>
+        <td>⚠️ Canal de llamada y emergencia (monitoreo obligatorio). Tambien opera L2G.</td>
+      </tr>
+      <tr>
+        <td>CH71</td>
+        <td class="muted">156.575 MHz</td>
+        <td>Embarcaciones menores</td>
+      </tr>
+      <tr>
+        <td>CH73</td>
+        <td class="muted">156.675 MHz</td>
+        <td>🇺🇾 Estación Pocitos — practicaje zona portuaria</td>
+      </tr>
+      <tr>
+        <td>CH74</td>
+        <td class="muted">156.725 MHz</td>
+        <td>🇺🇾 Autorización de zarpe de lanchas</td>
+      </tr>
+      <tr>
+        <td>CH77</td>
+        <td class="muted">156.875 MHz</td>
+        <td>🇺🇾 Practicaje Montevideo — despacho de prácticos y estado del puerto</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h2 id="ch16">CH16 — El canal de todos</h2>
+
+  <p>
+    El Canal 16 (156.800 MHz) es el canal de guardia internacional. Todos los buques con radio VHF
+    están obligados a monitorearlo en todo momento. Es el canal donde se hacen los llamados iniciales
+    y donde se manda la señal de socorro.
+  </p>
+
+  <p>
+    En el Río de la Plata, CH16 es el canal de primer contacto entre la estación de prácticos y los
+    buques que se aproximan. La dinámica: la estación llama al buque por nombre, el buque
+    responde, y se acuerda un canal de trabajo para continuar la comunicación.
+  </p>
+
+  <p>
+    Es el único canal con actividad constante en la madrugada. <strong>L2G</strong> (Lima dos Golf) aparece en CH16, lo que indica que también monitorea el canal de guardia mientras opera.
+  </p>
+
+  <div class="quote-block">
+    <p>Grande Houston, Grande Houston, practico Montevideo.</p>
+    <audio controls src="CH12-156600_20260509_110825.mp3"></audio>
+    <span class="q-source">CH12 · 11:08 · CH12-156600_20260509_110825.mp3</span>
+  </div>
+
+  <div class="quote-block">
+    <p>⚠️ Atención embarcaciones a la escucha, este es Control Puerto Buceo que con la hora 0755 0755 puerto cerrado general por fuertes vientos.</p>
+    <audio controls src="CH16-156800_20260508_105531.mp3"></audio>
+    <span class="q-source">CH16 · 10:55 · CH16-156800_20260508_105531.mp3</span>
+  </div>
+
+  <h2 id="practicaje">CH77, CH74, CH73 — Practicaje</h2>
+
+  <p>
+    El sistema de practicaje del Río de la Plata opera con al menos tres canales simultáneos.
+    <strong>CH77</strong> es el canal principal de la estación de prácticos de Montevideo.
+    Desde aquí se despachan las lanchas, se confirman posiciones de embarque con coordenadas
+    lat/lon, y se gestiona el estado operativo del puerto en tiempo real.
+  </p>
+
+  <p>
+    El tráfico en CH77 revela una operación compleja: múltiples lanchas nombradas
+    (<strong>Carrasco</strong>, <strong>Cutter</strong>, <strong>Belgrano</strong>) cubren distintas zonas.
+  </p>
+
+  <div class="quote-block">
+    <p>Capitán, ¿cómo le va? Le comento, tengo la Belgrano en zona alfa, sí, y las dos lanchas,
+    tanto la Cutter como la Carrasco, la Carrasco va a estar haciendo un desembarco 23.45 al 02.05,
+    me informa que va a poder estar por usted a las 01.30. Es la lancha que más rápido la podría tener.</p>
+    <audio controls src="CH77-156875_20260505_013800.mp3"></audio>
+    <span class="q-source">CH77 · 01:38 · CH77-156875_20260505_013800.mp3</span>
+  </div>
+
+  <p>
+    <strong>CH74</strong> es el canal de autorización de zarpe de las lanchas. Cada salida sigue
+    un protocolo estricto: la lancha solicita "autorización de zarpe" con tripulación completa
+    (patrón + marinero) y ETA de regreso; una vez autorizada, reporta el nombre fonético del buque,
+    número IMO y nombres de los prácticos que embarcarán o desembarcarán.
+  </p>
+
+  <div class="quote-block">
+    <p>Buenos días control, autorización de zarpe. Tripulación: patrón F******* **********,
+    marinero ******** *****, marinero ******* ******. Operativa de regreso 10-30. Cambio.</p>
+    <span class="q-source">CH74 · Solicitud de autorización de zarpe de lancha · 2026-05-06 11:47</span>
+  </div>
+
+  <div class="quote-block">
+    <p>Vamos al desembarque del buque Rostrum Solar. Rostrum Solar, con el kilómetro 236.
+    Ahí es donde embarcan los prácticos ***** y ********. ***** y ********, número IMO 9941623.</p>
+    <span class="q-source">CH74 · Despacho de prácticos en km 236 del Canal Punta Indio · 2026-05-07 12:00</span>
+  </div>
+
+  <p>
+    <strong>CH73</strong> corresponde a la 🇺🇾 Estación Pocitos. Gestiona los prácticos dentro del área portuaria, coordina horarios y puntos de desembarco.
+  </p>
+
+  <p>
+    CH73 tiene un patrón bilingüe: el operador habla en español con las lanchas pero
+    cambia al inglés para dar instrucciones al buque sobre la escala de práctico. La instrucción
+    aparece con variaciones mínimas en decenas de grabaciones:
+  </p>
+
+  <div class="quote-block">
+    <p>Thank you sir, thanks for your cooperation. Stand by all the time on channel 73 and
+    prepare please your pilot ladder on both sides. Port and starboard, one meter above
+    the water will be ok.</p>
+    <audio controls src="CH73-156675_20260505_134119.mp3"></audio>
+    <span class="q-source">CH73 · 13:41 · CH73-156675_20260505_134119.mp3</span>
+  </div>
+
+  <div class="quote-block">
+    <p>Hola, buenas tardes. Desde Buenos Aires me dieron el OK para gestionar el desembarco
+    con la EDERRA. La EDERRA me solicita la ETA y el punto de desembarque.</p>
+    <span class="q-source">CH73 · Coordinación de desembarco con empresa de lanchas · 2026-05-08 19:24</span>
+  </div>
+
+  <h2 id="portcontrol">CH12 y CH13 — Port Control</h2>
+
+  <p>
+    <strong>CH13</strong> (156.650 MHz) es el canal del 🇺🇾 Montevideo Port Control — el servicio de
+    tráfico marítimo (VTS) que controla los movimientos en la zona de servicio del puerto.
+    Los buques reportan su estado, solicitan permisos de maniobra y declaran su tránsito
+    por la zona. Es el canal más formal del sistema.
+  </p>
+
+  <div class="quote-block">
+    <p>Muy buenas noches, operadora. Este es el VN. Viniendo actualmente el canal Punta Indio,
+    práctico argentino a bordo. Tenemos coordinado nuestro desembarco con una lancha
+    que nos solicitó posición de desembarco al sur del kilómetro 23 del canal de
+    acceso a su puerto. Voy a atravesar la zona de servicio para ir a desembarcar al sur del
+    kilómetro 23, luego este buque continuará hasta aguas abiertas por fuera del canal.</p>
+    <span class="q-source">CH13 · Buque en Canal Punta Indio informando tránsito a Port Control Montevideo · 2026-05-07 23:48</span>
+  </div>
+
+  <p>
+    <strong>CH12</strong> (156.600 MHz) es el canal de mayor actividad continua: donde opera las 24 horas 🇦🇷 L2G. Su función principal es el registro de arribo: se reporta cada buque que se aproxima
+    con datos completos en un formato similar.
+  </p>
+
+  <p>
+    Los reportes siguen la secuencia: nombre del buque deletreado fonéticamente, señal de llamada, agencia, calado máximo, procedencia, destino y ETA. Los destinos más comunes: San Lorenzo, Rosario, Campana, Zárate, Nueva Palmira, Buenos Aires.
+  </p>
+
+  <div class="quote-block">
+    <p>El buque es el North Houston. November Oscar Romeo Sierra Echo, separado, Hotel Oscar Uniform
+    Sierra Tango Oscar November. De agencia ISA. Calado 6 metros 40. Destino Rosario, de Brasil el
+    2 de mayo, con 22 tripulantes. Buque previsto para 21 horas.</p>
+    <span class="q-source">CH12 · Registro de arribo — formato típico de reporte de agente marítimo · 2026-05-06 19:06</span>
+  </div>
+
+  <div class="quote-block">
+    <p>L2G, buenas noches. Nosotros vamos a tener el embarque del **** ****** de la agencia Raizen.
+    Viene con 8.50 metros desde Puerto Rosales a Buenos Aires para las 6 de la mañana.</p>
+    <span class="q-source">CH12 · L2G coordina embarque · 2026-05-06 03:14</span>
+  </div>
+
+   <h2 id="incidentes">Eventos</h2>
+
+  <p>
+    Entre los miles de grabaciones, algunos episodios se destacaron:
+  </p>
+
+  <!-- INCIDENT 1 -->
+  <div class="incident">
+    <div class="incident-header">
+      <span class="incident-label cierre">🌩️ Cierre de puertos</span>
+      <span class="incident-date">2026-05-09 · 07:33 – 11:05 HS</span>
+    </div>
+    <h3>Sudestada</h3>
+    <p>
+      Una jornada de viento fuerte cerró simultáneamente Montevideo y Puerto Buceo. La situación
+      era tan severa que varios buques en el área de Recalada no podían fondear y quedaron
+      a la deriva esperando condiciones para proceder.
+    </p>
+    <div class="quote-block" style="margin: 0.75rem 0;">
+      <p>"Yes, many vessels here on the area are drifting because the condition is so bad to drop anchor. So maybe the vessel you proceeded slowly to recalada."</p>
+      <audio controls src="CH77-156875_20260509_073540.mp3"></audio>
+      <span class="q-source">CH77 · 07:35 · CH77-156875_20260509_073540.mp3</span>
+    </div>
+    <div class="quote-block" style="margin: 0.75rem 0;">
+      <p>"Well sir, the same situation here. The bad weather conditions continue here in the area and the strong winds continue here so the port is closed. The two ports are closed now so I am waiting for better conditions."</p>
+      <audio controls src="CH77-156875_20260509_103206.mp3"></audio>
+      <span class="q-source">CH77 · 10:32 · CH77-156875_20260509_103206.mp3</span>
+    </div>
+    <p>
+      A las ~11:00, múltiples buques llamaban a Recalada/Port Control sin obtener respuesta, en
+      forma simultánea desde CH15, CH12 y CH16:
+    </p>
+    <div class="quote-block" style="margin: 0.75rem 0;">
+      <p>"Recalada, recalada. Control, usted me recibe." — "Control buceo, control buceo, me recibe." — "Reica, buceo, ¿me recibís?"</p>
+      <span class="q-source">CH15, CH12, CH12 · ~11:00 · CH15-156750_20260509_110007.mp3 / CH12-156600_20260509_110443.mp3</span>
+    </div>
+  </div>
+
+  <!-- INCIDENT 2 -->
+  <div class="incident">
+    <div class="incident-header">
+      <span class="incident-label anomalia">❓ Sin respuesta</span>
+      <span class="incident-date">2026-05-07 · 15:05 – 21:21 HS</span>
+    </div>
+    <h3>Eva Master — buque que no responde durante más de 6 horas</h3>
+    <p>
+      El buque Eva Master fue registrado en CH12 a las 15:12 (agencia ISA, calado 6.80 m, destino
+      San Lorenzo, proveniente de Brasil). Minutos después, la estación de prácticos comenzó a
+      llamarlo en CH16 y CH77. Los llamados se repitieron sin respuesta consistente durante más de
+      seis horas.
+    </p>
+    <div class="quote-block" style="margin: 0.75rem 0;">
+      <p>"Atención vessel, Eva Master, Eva Master, by the station calling. Do you read me, Eva Master?"</p>
+      <audio controls src="CH16-156800_20260507_154417.mp3"></audio>
+      <span class="q-source">CH16 · 15:44 · CH16-156800_20260507_154417.mp3</span>
+    </div>
+  </div>
+
+  <!-- INCIDENT 6 -->
+  <div class="incident">
+    <div class="incident-header">
+      <span class="incident-label curiosidad">⚡ RADIO</span>
+      <span class="incident-date">2026-05-07 · 11:51 HS</span>
+    </div>
+    <h3>Radio con falla intermitente — operador prueba cruzando canales</h3>
+    <p>
+      Un operador reporta un radio con "funcionamiento intermitente" y hace prueba entre CH12/CH77 para diagnosticar: 
+    </p>
+    <div class="quote-block" style="margin: 0.75rem 0;">
+      <p>"Yo no voy a llamar ahora en un equipo que está con funcionamiento intermitente. Así lo pruebo. ¿Me puede hacer este favor? Yo voy a pasar a 12, lo voy a llamar en 12 y lo voy a pasar a 77. Pero siempre con el mismo equipo, a ver si se me copia bien. ¿Puede ser?"</p>
+      <audio controls src="CH77-156875_20260507_115138.mp3"></audio>
+      <span class="q-source">CH77 · 11:51 · CH77-156875_20260507_115138.mp3</span>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <p>
+      <strong>Nota metodológica.</strong> Las transcripciones automáticas con Whisper tienen una tasa
+      de error variable, especialmente en nombres propios de buques, señales de llamada y terminología
+      náutica en mezcla de idiomas. Los fragmentos citados no fueron revisados para verificar que el
+      contenido refleja lo escuchado. Los filenames de audio siguen el formato
+      <code>[CANAL]_[YYYYMMDD]_[HHMMSS].mp3</code>.
+    </p>
+  </div>
+
+  <h2 id="datos">Datos</h2>
+  <ul>
+    <li><a href="https://www.navcen.uscg.gov/international-vhf-marine-radio-channels-freq">International VHF Marine Radio Channels and Frequencies</a></li>
+  </ul>
+  <ul>
+    <li><a href="CH12-156600_20260509_110825.mp3">CH12-156600_20260509_110825.mp3</a></li>
+    <li><a href="CH16-156800_20260507_154417.mp3">CH16-156800_20260507_154417.mp3</a></li>
+    <li><a href="CH16-156800_20260508_105531.mp3">CH16-156800_20260508_105531.mp3</a></li>
+    <li><a href="CH73-156675_20260505_134119.mp3">CH73-156675_20260505_134119.mp3</a></li>
+    <li><a href="CH77-156875_20260505_013800.mp3">CH77-156875_20260505_013800.mp3</a></li>
+    <li><a href="CH77-156875_20260507_115138.mp3">CH77-156875_20260507_115138.mp3</a></li>
+    <li><a href="CH77-156875_20260509_073540.mp3">CH77-156875_20260509_073540.mp3</a></li>
+    <li><a href="CH77-156875_20260509_103206.mp3">CH77-156875_20260509_103206.mp3</a></li>
+  </ul>
+
+
+  <div class="post-footer">
+    <p>Por: <a href="https://x.com/LU1AAT" target="_blank" rel="noopener noreferrer">LU1AAT</a> / CX9CAT &nbsp;·&nbsp; <a href="../../">AIS Rio de la Plata</a></p>
+    <p>Grabaciones: RTL-SDR · Transcripciones: Whisper</p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="../../">← Volver al inicio</a>
+</footer>
+
+</body>
+</html>
