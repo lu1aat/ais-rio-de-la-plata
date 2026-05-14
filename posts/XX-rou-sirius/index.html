@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PQCLGDEJL3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PQCLGDEJL3');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROU 21 Sirius — 37 años del balizador de la Armada Uruguaya — AIS Rio de la Plata</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0f1e;
+      color: #dce8f8;
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+    header {
+      position: relative;
+      border-bottom: 1px solid #1e3a5f;
+      padding: 1.25rem 2rem;
+      background: #060b15;
+      overflow: hidden;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(125, 211, 252, 0.0) 20%,
+        rgba(125, 211, 252, 0.55) 50%,
+        rgba(125, 211, 252, 0.0) 80%,
+        transparent 100%
+      );
+      animation: header-scan 5s ease-in-out infinite;
+    }
+
+    @keyframes header-scan {
+      0%, 100% { opacity: 0.15; }
+      50%       { opacity: 1; }
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .header-badge {
+      position: relative;
+      width: 2.4rem;
+      height: 2.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .badge-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      animation: ring-pulse 3.5s ease-out infinite;
+    }
+
+    .badge-ring::after {
+      content: '';
+      position: absolute;
+      inset: -7px;
+      border-radius: 50%;
+      border: 1px solid rgba(125, 211, 252, 0.08);
+      animation: ring-pulse 3.5s ease-out 0.9s infinite;
+    }
+
+    @keyframes ring-pulse {
+      0%  { transform: scale(0.92); opacity: 0.8; }
+      70% { transform: scale(1.3);  opacity: 0; }
+      100%{ transform: scale(1.3);  opacity: 0; }
+    }
+
+    .badge-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .site-identity a {
+      font-size: 0.85rem;
+      color: #7aaec8;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .site-identity a:hover { color: #7dd3fc; }
+
+    main {
+      margin: 3.5rem auto;
+      padding: 0 2rem;
+      max-width: 900px;
+    }
+
+    .post-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: #7aaec8;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 2.5rem;
+      color: #e8f4ff;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .post-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #7aaec8;
+      margin-bottom: 2rem;
+      letter-spacing: 0.06em;
+    }
+
+    .intro p {
+      font-size: 0.95rem;
+      color: #c0d6ea;
+      margin-bottom: 0.5rem;
+    }
+    .intro p:last-child { margin-bottom: 0; }
+
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #7dd3fc;
+      font-weight: bold;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 3rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #1e3a5f;
+      clear: both;
+    }
+
+    h3 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 1rem;
+      color: #c0d8f4;
+      font-weight: 600;
+      margin: 2rem 0 0.65rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #d0e4f6;
+      margin-bottom: 1rem;
+    }
+
+    strong { color: #e8f4ff; font-weight: 600; }
+
+    em {
+      font-family: 'JetBrains Mono', monospace;
+      font-style: normal;
+      font-size: 0.88em;
+      color: #7dd3fc;
+      background: #0d1a2e;
+      border: 1px solid #1a3050;
+      padding: 0.05em 0.35em;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #0d1a2e;
+      border: 1px solid #1e3a5f;
+      padding: 0.1em 0.4em;
+      font-size: 0.83em;
+      color: #7dd3fc;
+    }
+
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── callout box ─────────────────────────────────── */
+    .callout {
+      border-left: 3px solid #1e3a5f;
+      background: #0d1a2e;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+    }
+
+    .callout.warn { border-left-color: #e67e22; }
+    .callout.info { border-left-color: #2980b9; }
+
+    .callout p {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      color: #bacce0;
+    }
+
+    /* ── table ───────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      background: #0d1a2e;
+      color: #7aaec8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #0f1e35;
+      vertical-align: top;
+      line-height: 1.55;
+      color: #d0e4f6;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: #7dd3fc;
+      white-space: nowrap;
+      font-size: 0.82rem;
+    }
+
+    /* ── spec table ──────────────────────────────────── */
+    .spec-table td:first-child {
+      width: 42%;
+      color: #7aaec8;
+      font-size: 0.82rem;
+    }
+
+    /* ── spec table 2-col (label / value / label / value) ── */
+    .spec-2col { table-layout: fixed; }
+
+    .spec-2col td:nth-child(odd) {
+      width: 21%;
+      color: #7aaec8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    .spec-2col td:nth-child(even) {
+      width: 29%;
+      color: #d0e4f6;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.9rem;
+    }
+
+    /* ── code block ──────────────────────────────────── */
+    .code-block {
+      background: #060c18;
+      border: 1px solid #1e3a5f;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c0d6ea;
+      white-space: pre;
+    }
+
+    .code-block .field   { color: #7dd3fc; }
+    .code-block .value   { color: #a8d8a0; }
+    .code-block .comment { color: #4a6e90; }
+    .code-block .label   { color: #e8b86d; }
+
+    /* ── images ──────────────────────────────────────── */
+    .img-block { margin: 1.5rem 0; }
+
+    .img-block.half-right {
+      float: right;
+      width: 50%;
+      margin: 0 0 1.5rem 2rem;
+    }
+
+    .clearfix::after { content: ''; display: table; clear: both; }
+
+    .img-block img {
+      width: 100%;
+      display: block;
+      border: 1px solid #1e3a5f;
+    }
+
+    .img-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #7aaec8;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── map ─────────────────────────────────────────── */
+    #track-map {
+      width: 100%;
+      height: 420px;
+      margin: 1.5rem 0;
+      border: 1px solid #1e3a5f;
+      background: #0a1525;
+    }
+
+    .map-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #7aaec8;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    .map-legend {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .map-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #7aaec8;
+    }
+
+    .map-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .pt-tooltip {
+      background: rgba(0,0,0,0.92) !important;
+      border: 1px solid #333 !important;
+      border-radius: 2px !important;
+      padding: 5px 9px !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.78em !important;
+      color: #FFB000 !important;
+      white-space: nowrap !important;
+      box-shadow: none !important;
+    }
+    .pt-tooltip::before { display: none !important; }
+
+    .map-marker {
+      position: relative;
+      background: #0d1829;
+      border: 1px solid #7dd3fc;
+      border-radius: 5px;
+      padding: 4px 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: #c8e8ff;
+      white-space: nowrap;
+      line-height: 1.35;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      transform: translateX(-50%) translateY(calc(-100% - 7px));
+    }
+    .map-marker::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 7px solid #7dd3fc;
+    }
+    .map-marker::before {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #0d1829;
+      z-index: 1;
+    }
+    .map-marker.port {
+      border-color: #2ecc71;
+    }
+    .map-marker.port::after { border-top-color: #2ecc71; }
+    .map-marker .mdate {
+      color: #7dd3fc;
+      display: block;
+      font-size: 9px;
+      font-weight: bold;
+      margin-bottom: 1px;
+    }
+    .map-marker.port .mdate { color: #2ecc71; }
+
+    /* ── toc ─────────────────────────────────────────── */
+    .toc {
+      border: 1px solid #1e3a5f;
+      padding: 0.9rem 1.1rem;
+      margin: 0 0 1.5rem 2rem;
+      float: right;
+      min-width: 240px;
+    }
+
+    .toc-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7aaec8;
+      margin-bottom: 0.6rem;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-section;
+      margin: 0; padding: 0;
+    }
+
+    .toc > ol > li {
+      counter-increment: toc-section;
+      margin-bottom: 0.25rem;
+    }
+
+    .toc > ol > li > a::before {
+      content: counter(toc-section) '. ';
+      font-family: 'JetBrains Mono', monospace;
+      color: #7aaec8;
+      font-size: 0.78rem;
+    }
+
+    .toc a { font-size: 0.82rem; color: #c0d6ea; text-decoration: none; }
+    .toc a:hover { color: #7dd3fc; }
+
+    .toc-group-label {
+      font-size: 0.82rem;
+      color: #c0d6ea;
+    }
+
+    .toc-group-label::before {
+      content: counter(toc-section) '. ';
+      font-family: 'JetBrains Mono', monospace;
+      color: #7aaec8;
+      font-size: 0.78rem;
+    }
+
+    .toc-group > ol {
+      list-style: none;
+      margin: 0.2rem 0 0 1.1rem;
+      padding: 0;
+    }
+
+    .toc-group > ol > li { margin-bottom: 0.15rem; }
+
+    .toc-group > ol > li > a { font-size: 0.78rem; color: #7aaec8; text-decoration: none; }
+    .toc-group > ol > li > a:hover { color: #7dd3fc; }
+
+    /* ── video embed ─────────────────────────────────── */
+    .video-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      margin: 1.25rem 0;
+      border: 1px solid #1e3a5f;
+    }
+
+    .video-wrap iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+
+    .video-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #7aaec8;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── post footer ─────────────────────────────────── */
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1e3a5f;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #7aaec8;
+      line-height: 2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #4a6e90;
+      font-size: 0.72rem;
+    }
+
+    footer a { color: #7aaec8; text-decoration: none; }
+    footer a:hover { color: #7dd3fc; }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1e3a5f;
+      margin: 2.5rem 0;
+    }
+
+    ul, ol {
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      font-size: 0.95rem;
+      color: #d0e4f6;
+      line-height: 1.75;
+      margin-bottom: 0.2rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="header-badge" href="../../">
+      <span class="badge-ring"></span>
+      <span class="badge-icon">⚓</span>
+    </a>
+    <div class="site-identity">
+      <a href="../../">AIS · Río de la Plata</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <p class="post-meta">Publicación #XX — Borrador</p>
+  <h1>ROU 21 Sirius: 37 años del balizador de la Armada Uruguaya</h1>
+  <p class="post-date">12 de mayo de 2026</p>
+
+  <div class="intro">
+    <p>El <strong>ROU 21 "Sirius"</strong> es el único buque balizador de la Armada Nacional del Uruguay. Desde su abanderamiento el 12 de mayo de 1989 mantiene las ~300 señales náuticas de ríos y costas uruguayas. Hoy cumple <strong>37 años de servicio ininterrumpido</strong>.</p>
+  </div>
+
+  <div class="toc">
+    <p class="toc-title">Índice</p>
+    <ol>
+      <li><a href="#historia">Historia y ficha técnica</a></li>
+      <li><a href="#mision">Misión: el balizamiento</a></li>
+      <li><a href="#operaciones">Algunos hitos operacionales</a></li>
+      <li class="toc-group">
+        <span class="toc-group-label">AIS</span>
+        <ol>
+          <li><a href="#ais">Datos técnicos</a></li>
+          <li><a href="#mensajes">Mensajes capturados</a></li>
+          <li><a href="#sesiones">Sesiones capturadas</a></li>
+        </ol>
+      </li>
+      <li><a href="#orion">El ROU 25 Orión</a></li>
+      <li><a href="#videos">Videos</a></li>
+      <li><a href="#fuentes">Fuentes</a></li>
+    </ol>
+  </div>
+
+  <div class="img-block" style="clear:both">
+    <img src="sirius-2019.jpg" alt="ROU 21 Sirius navegando en el Río de la Plata, 2019" loading="lazy">
+    <p class="img-caption">ROU 21 Sirius, 2019 — Foto: Marcelo Campi / <a href="https://commons.wikimedia.org/wiki/File:ROU_21_Sirius_%2848334200202%29.jpg" target="_blank" rel="noopener noreferrer">CC BY-SA 2.0</a></p>
+  </div>
+
+  <!-- ── Historia ──────────────────────────────────────── -->
+  <h2 id="historia">Historia y ficha técnica</h2>
+
+  <div class="img-block" style="max-width:540px; margin:1.5rem auto">
+    <img src="sirius-2019.jpg" alt="ROU 21 Sirius — buque balizador de la Armada Nacional del Uruguay" loading="lazy">
+    <p class="img-caption" style="text-align:center">El Sirius con su grúa electrohidráulica de proa, pieza central para el izado de boyas</p>
+  </div>
+
+  <table class="spec-table spec-2col">
+    <tbody>
+      <tr>
+        <td>Número de casco</td><td>ROU 21</td>
+        <td>Tipo</td><td>Buque balizador (buoy tender)</td>
+      </tr>
+      <tr>
+        <td>Botadura</td><td>5 de febrero de 1988</td>
+        <td>Abanderamiento</td><td><a href="https://www.armada.mil.uy/index.php/noticias/643-33-aniversario-del-rou-21-sirius" target="_blank" rel="noopener noreferrer">12 de mayo de 1989</a></td>
+      </tr>
+      <tr>
+        <td>Eslora</td><td>35 m</td>
+        <td>Manga</td><td>10 m</td>
+      </tr>
+      <tr>
+        <td>Desplazamiento</td><td>~150 t</td>
+        <td>Propulsión</td><td>Doble hélice (twin-screw)</td>
+      </tr>
+      <tr>
+        <td>Constructor</td><td colspan="3">SCRA — Servicio de Construcciones, Reparaciones y Armamento de la Armada, Dique Nacional, Montevideo</td>
+      </tr>
+      <tr>
+        <td>Diseño</td><td colspan="3">Damen Shipyards (Países Bajos)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>El Sirius fue construido íntegramente en el <strong>Dique Nacional de Montevideo</strong> por el SCRA, un hito para la industria naval uruguaya: diseño europeo, mano de obra 100% nacional. Damen Shipyards transfirió los planos y proveyó el kit de componentes especializados, incluyendo la <strong>grúa de cubierta electrohidráulica de proa</strong> — pieza central para el izado y despliegue de boyas en mar abierto.</p>
+
+  <p>Pasaron 15 meses entre la <strong>botadura del casco</strong> (febrero 1988) y el <a href="https://www.armada.mil.uy/index.php/noticias/643-33-aniversario-del-rou-21-sirius" target="_blank" rel="noopener noreferrer"><strong>abanderamiento</strong></a> (mayo 1989), período en que se completaron instalación de sistemas, pruebas de mar y entrega formal a la Armada. Desde entonces opera sin interrupción como único balizador de la flota — 37 años que incluyen campañas en el Río Uruguay, ejercicios multinacionales y el mantenimiento rutinario de cientos de señales náuticas a lo largo de toda la costa.</p>
+
+  <!-- ── Misión ─────────────────────────────────────────── -->
+  <h2 id="mision">Misión: el balizamiento</h2>
+
+  <p>El Sirius es la plataforma operativa del <strong>SERBA</strong> (Servicio de Iluminación y Balizamiento). Mantiene unas <strong>300 señales náuticas</strong> en siete departamentos costeros:</p>
+
+  <ul>
+    <li>Recambio de balizas luminosas y boyas de canal</li>
+    <li>Verificación de fondeos y cadenas de anclaje</li>
+    <li>Reposición de balizas afectadas por colisiones o deriva</li>
+    <li>Instalación de señales en canales nuevos</li>
+    <li>Abastecimiento logístico al faro de la Isla de Lobos</li>
+  </ul>
+
+  <p>Áreas habituales: Canal de Acceso a Montevideo, Bahía de Maldonado, desembocaduras del Santa Lucía y del Rosario, Canal Norte del Río de la Plata, y el Río Uruguay en coordinación con la Armada Argentina.</p>
+
+  <!-- ── Operaciones ────────────────────────────────────── -->
+  <h2 id="operaciones">Algunos hitos operacionales</h2>
+
+  <h3>Campaña del Río Uruguay (2017–2018)</h3>
+  <p>Balizamiento del Canal Casa Blanca y tres etapas sucesivas: <strong>72 boyas</strong> posicionadas, <a href="https://sohma.armada.mil.uy/index.php/noticias/315-campanas-de-instalacion-de-nuevos-servicios-de-balizamiento-en-el-rio-uruguay" target="_blank" rel="noopener noreferrer"><strong>2.000 mn navegadas en 30 días efectivos</strong></a>, en coordinación con la Armada Argentina (sector bonaerense).</p>
+
+  <h3>Boya oceanográfica del SOHMA (2024)</h3>
+  <p>El Sirius desplegó la primera boya oceanográfica del <a href="https://sohma.armada.mil.uy/" target="_blank" rel="noopener noreferrer">SOHMA</a> para medición meteoceánica (oleaje, temperatura, corrientes). La boya transmite por AIS (Mensaje 21, AtoN).</p>
+
+  <h3>Mantenimiento rutinario</h3>
+  <p>Campaña anual de febrero–marzo: en 2022–2023 se revisaron más de <strong>80 señales</strong> en una sola campaña abarcando los siete departamentos costeros.</p>
+
+  <h3 id="acrux">ACRUX XII — 2026</h3>
+
+  <p>El <strong>Ejercicio Combinado ACRUX</strong> es la serie bienal de maniobras fluviales de las armadas de Argentina, Brasil, Uruguay, Paraguay y Bolivia en la Hidrovía Paraguay-Paraná. Para <strong>ACRUX XII</strong>, el <a href="http://www.diputados.gub.uy/proyectos/acrux-xii-se-autoriza-la-salida-de-aguas-jurisdiccionales-y-del-territorio-nacional-de-la-plana-mayor-y-tripulacion-de-los-buques-rou-11-rio-negro-y-rou-21-sirius-y-efectivos-pertenecientes/" target="_blank" rel="noopener noreferrer">Parlamento autorizó la salida del ROU 11 "Río Negro" y el ROU 21 "Sirius"</a> hasta el <strong>20 de mayo de 2026</strong>. La fase operativa fue del 16 al 26 de abril en el Complejo Naval de Ladário (Corumbá, Brasil): <a href="https://www.zona-militar.com/2026/04/28/con-el-despliegue-de-700-efectivos-y-18-unidades-de-las-armadas-de-argentina-brasil-uruguay-paraguay-y-bolivia-finalizo-en-mato-grosso-do-sul-el-ejercicio-acrux-xii/" target="_blank" rel="noopener noreferrer">700 efectivos y 18 unidades</a> de cinco países.</p>
+
+  <div class="callout info">
+    <p>El ROU 21 Sirius cumple hoy su 37° aniversario <strong>navegando de regreso desde Brasil</strong>, con llegada autorizada hasta el 20 de mayo.</p>
+  </div>
+
+  <!-- ── AIS Técnico ────────────────────────────────────── -->
+  <h2 id="ais">AIS: datos técnicos</h2>
+
+  <p>El Sirius porta un transponder AIS activo, capturado por el receptor costero de este proyecto.</p>
+
+  <table>
+    <thead>
+      <tr><th>Campo</th><th>Valor</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>MMSI</td><td>770576022</td></tr>
+      <tr><td>IMO</td><td><a href="https://www.shipspotting.com/photos/2110371" target="_blank" rel="noopener noreferrer">8604046</a></td></tr>
+      <tr><td>Nombre AIS</td><td>SIRIUS</td></tr>
+      <tr><td>Indicativo (callsign)</td><td>CWBO</td></tr>
+      <tr><td>Tipo de buque (ShipType)</td><td>35 — Military ops</td></tr>
+      <tr><td>Clase de transponder</td><td><strong>Clase B</strong></td></tr>
+      <tr><td>Total de paquetes capturados</td><td>649 (543 posición + 106 estáticos)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Clase B, no Clase A</h3>
+
+  <p>El Sirius usa transponder <strong>Clase B</strong> — estándar para buques no obligados por SOLAS que transmiten voluntariamente. Diferencias prácticas respecto a la Clase A mercante:</p>
+
+  <table>
+    <thead>
+      <tr><th>Campo</th><th>Clase A (mercante)</th><th>Clase B (Sirius)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Mensaje de posición</td><td>Tipo 1 / 2 / 3</td><td><strong>Tipo 18</strong></td></tr>
+      <tr><td>Mensaje estático</td><td>Tipo 5 (nombre + IMO + destino + calado)</td><td><strong>Tipo 24 Part A + B</strong> (nombre + callsign + tipo)</td></tr>
+      <tr><td>Intervalo en tránsito</td><td>2–10 s</td><td><strong>30 s</strong></td></tr>
+      <tr><td>Nav Status</td><td>Sí (fondeo, maniobra restringida, etc.)</td><td><strong>No transmite</strong></td></tr>
+      <tr><td>ROT / True Heading</td><td>Sí</td><td><strong>No / 511 (N/A)</strong></td></tr>
+      <tr><td>IMO / Destino / ETA</td><td>Sí</td><td><strong>No</strong></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── Tipos de mensajes ──────────────────────────────── -->
+  <h2 id="mensajes">Mensajes AIS capturados</h2>
+
+  <h3>Mensaje 18 — Position Report Clase B</h3>
+
+  <p>Ejemplo: 26 de febrero de 2026, tránsito a plena velocidad rumbo al Canal de Punta Indio.</p>
+
+  <div class="code-block"><pre><span class="label">RAW  </span> <span class="comment">!AIVDM,1,1,,A,B;Np>UP0Gg00QUK0EtLgkwRVoP06,0*0E</span>
+<span class="comment">── Mensaje 18 decodificado ─────────────────────────────</span>
+<span class="field">Message Type  </span> <span class="value">18</span>              <span class="comment">Standard Class B CS Position Report</span>
+<span class="field">MMSI          </span> <span class="value">770576022</span>       <span class="comment">MID 770 = Uruguay</span>
+<span class="field">SOG           </span> <span class="value">9.4 kn</span>
+<span class="field">Longitude     </span> <span class="value">-55.916889°</span>
+<span class="field">Latitude      </span> <span class="value">-34.915081°</span>
+<span class="field">COG           </span> <span class="value">76.4°</span>
+<span class="field">True Heading  </span> <span class="value">511</span>             <span class="comment">Sin sensor de rumbo (valor N/A)</span>
+<span class="field">Nav Status    </span> <span class="value">—</span>               <span class="comment">No disponible en Clase B</span>
+<span class="field">Timestamp UTC </span> <span class="value">2026-02-26 18:05:06</span></pre></div>
+
+  <p>Ejemplo: 17 de diciembre de 2025, Sirius detenido cerca del Canal de Acceso a Montevideo.</p>
+
+  <div class="code-block"><pre><span class="label">RAW  </span> <span class="comment">!AIVDM,1,1,,,B;Np>UP00>wiMqs0ERpjwwR6oP06,0*14</span>
+<span class="comment">── Mensaje 18 decodificado ─────────────────────────────</span>
+<span class="field">Message Type  </span> <span class="value">18</span>
+<span class="field">MMSI          </span> <span class="value">770576022</span>
+<span class="field">SOG           </span> <span class="value">0.0 kn</span>          <span class="comment">Detenido</span>
+<span class="field">Longitude     </span> <span class="value">-56.122475°</span>
+<span class="field">Latitude      </span> <span class="value">-34.915764°</span>
+<span class="field">COG           </span> <span class="value">81.5°</span>           <span class="comment">COG errático a SOG=0: sin significado real</span>
+<span class="field">True Heading  </span> <span class="value">511</span>
+<span class="field">Timestamp UTC </span> <span class="value">2025-12-17 17:52:03</span></pre></div>
+
+  <h3>Mensaje 24 — Class B Static Data (Part A y Part B)</h3>
+
+  <p>Emitido en dos tramas NMEA independientes, vinculadas por MMSI:</p>
+
+  <div class="code-block"><pre><span class="label">PART A </span> <span class="comment">!AIVDM,1,1,,B,H;Np>UQ&lt;U8UE&lt;00000000000000,2*2D</span>
+<span class="comment">── Parte A ─────────────────────────────────────────────</span>
+<span class="field">Message Type  </span> <span class="value">24</span>
+<span class="field">MMSI          </span> <span class="value">770576022</span>
+<span class="field">Part Number   </span> <span class="value">0</span>              <span class="comment">Part A</span>
+<span class="field">Vessel Name   </span> <span class="value">SIRIUS</span>
+
+<span class="label">PART B </span> <span class="comment">!AIVDM,1,1,,B,H;Np>UTS00000003G2?000404190,0*75</span>
+<span class="comment">── Parte B ─────────────────────────────────────────────</span>
+<span class="field">Message Type  </span> <span class="value">24</span>
+<span class="field">MMSI          </span> <span class="value">770576022</span>
+<span class="field">Part Number   </span> <span class="value">1</span>              <span class="comment">Part B</span>
+<span class="field">Ship Type     </span> <span class="value">35</span>             <span class="comment">Military ops</span>
+<span class="field">Call Sign     </span> <span class="value">CWBO</span>
+<span class="field">IMO           </span> <span class="value">—</span>             <span class="comment">No incluido en Clase B</span></pre></div>
+
+  <div class="callout">
+    <p>El IMO 8604046 existe en el registro Lloyd's pero el buque no lo emite por radio — esperable en Clase B, donde el estándar no contempla ese campo en Msg 24.</p>
+  </div>
+
+  <!-- ── Sesiones ───────────────────────────────────────── -->
+  <h2 id="sesiones">Sesiones capturadas</h2>
+
+  <p>El receptor capturó al Sirius en cuatro sesiones entre diciembre de 2025 y marzo de 2026:</p>
+
+  <table>
+    <thead>
+      <tr><th>Fecha</th><th>Paquetes</th><th>SOG rango / media</th><th>Zona aprox.</th><th>Perfil</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2025-12-17</td>
+        <td>239</td>
+        <td>0–9.8 kn / 6.3 kn</td>
+        <td>-34.94°, -56.11°</td>
+        <td>Operaciones + tránsito</td>
+      </tr>
+      <tr>
+        <td>2026-02-10</td>
+        <td>167</td>
+        <td>0–9.3 kn / 4.0 kn</td>
+        <td>-34.95°, -56.15°</td>
+        <td>Operaciones</td>
+      </tr>
+      <tr>
+        <td>2026-02-26</td>
+        <td>134</td>
+        <td>9.1–10.5 kn / 9.9 kn</td>
+        <td>-34.94°, -56.06°</td>
+        <td>Tránsito hacia el este</td>
+      </tr>
+      <tr>
+        <td>2026-03-26</td>
+        <td>3</td>
+        <td>1.0–6.2 kn / 3.0 kn</td>
+        <td>-34.98°, -56.13°</td>
+        <td>Captura parcial</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div id="track-map"></div>
+  <p class="map-caption">Posición representativa por sesión AIS capturada · Puerto de Montevideo marcado como referencia fija</p>
+  <div class="map-legend">
+    <div class="map-legend-item"><div class="map-legend-dot" style="background:#f39c12"></div>Operaciones + tránsito</div>
+    <div class="map-legend-item"><div class="map-legend-dot" style="background:#e74c3c"></div>Operaciones (baja vel.)</div>
+    <div class="map-legend-item"><div class="map-legend-dot" style="background:#2ecc71"></div>Tránsito / Puerto</div>
+    <div class="map-legend-item"><div class="map-legend-dot" style="background:#7aaec8"></div>Captura parcial</div>
+  </div>
+
+  <p>El Sirius no transmite Nav Status — no hay campo explícito de "maniobra restringida". El indicador Clase B equivalente: <strong>SOG &lt; 2 kn + COG incoherente + posición que apenas deriva</strong>. En tránsito, los paquetes se espacian ~30 s; brechas en múltiplos de 30 s indican paquetes no recibidos por el receptor, no cambios de cadencia del transponder.</p>
+
+  <!-- ── Orión ──────────────────────────────────────────── -->
+  <h2 id="orion">El ROU 25 Orión</h2>
+
+  <p>En 2011 se completó el <strong>ROU 25 "Orión"</strong>, catamarán balizador construido localmente y presentado como el sucesor del Sirius.</p>
+
+  <div class="callout warn">
+    <p>Durante las pruebas de mar se detectaron <strong>defectos mayores de construcción</strong> que comprometían la estabilidad estructural. El costo de reparación superó el valor de un buque nuevo. El Orión nunca entró en servicio.</p>
+  </div>
+
+  <p>El episodio dejó a la Armada con el Sirius como única opción operativa. En 2014, el <a href="https://www.infodefensa.com/texto-diario/mostrar/3134784/armada-uruguay-plantea-necesidades-hasta-2030" target="_blank" rel="noopener noreferrer">Plan de Necesidades 2014–2030</a> reconoció que la flota operaba "con tecnología de los años 60–70". En 2019 la Armada <a href="https://www.infodefensa.com/texto-diario/mostrar/3129867/armada-uruguaya-busca-astillero-suministre-nuevo-buque-balizador" target="_blank" rel="noopener noreferrer">llamó a concurso internacional</a> para un nuevo balizador. Al cierre de este artículo, el Sirius sigue siendo el único operativo.</p>
+
+  <!-- ── Videos ───────────────────────────────────────── -->
+  <h2 id="videos">Videos</h2>
+
+  <div class="video-wrap">
+    <iframe src="https://www.youtube.com/embed/HwXfQf_99KI"
+            title="Balizador ROU-21 Sirius en el puerto de Rosario, 09-09-2019"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+  </div>
+  <p class="video-caption">Balizador ROU 21 Sirius en el puerto de Rosario — 9 de septiembre de 2019</p>
+
+  <div class="video-wrap">
+    <iframe src="https://www.youtube.com/embed/w3gDJSc6-f4"
+            title="El ROU 21 Sirius — Servicio de Balizamiento de la Armada"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+  </div>
+  <p class="video-caption">ROU 21 Sirius — Servicio de Balizamiento de la Armada Nacional</p>
+
+  <!-- ── Fuentes ───────────────────────────────────────── -->
+  <h2 id="fuentes">Fuentes</h2>
+
+  <table>
+    <thead>
+      <tr><th>Fuente</th><th>Contenido</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://www.armada.mil.uy/index.php/noticias/643-33-aniversario-del-rou-21-sirius" target="_blank" rel="noopener noreferrer">Armada Nacional — 33° Aniversario ROU 21</a></td>
+        <td>Fechas oficiales de botadura y abanderamiento</td>
+      </tr>
+      <tr>
+        <td><a href="https://es.wikipedia.org/wiki/Sirius_(ROU_21)" target="_blank" rel="noopener noreferrer">Wikipedia — Sirius (ROU 21)</a></td>
+        <td>Características técnicas, historial de servicio</td>
+      </tr>
+      <tr>
+        <td><a href="https://sohma.armada.mil.uy/index.php/noticias/315-campanas-de-instalacion-de-nuevos-servicios-de-balizamiento-en-el-rio-uruguay" target="_blank" rel="noopener noreferrer">SOHMA — Campañas Río Uruguay</a></td>
+        <td>Etapas de balizamiento 2017–2018, cifras de boyas y millas</td>
+      </tr>
+      <tr>
+        <td><a href="http://www.diputados.gub.uy/proyectos/acrux-xii-se-autoriza-la-salida-de-aguas-jurisdiccionales-y-del-territorio-nacional-de-la-plana-mayor-y-tripulacion-de-los-buques-rou-11-rio-negro-y-rou-21-sirius-y-efectivos-pertenecientes/" target="_blank" rel="noopener noreferrer">Cámara de Representantes — Autorización ACRUX XII</a></td>
+        <td>Decreto parlamentario autorizando la salida del ROU 21 a Brasil</td>
+      </tr>
+      <tr>
+        <td><a href="https://www.zona-militar.com/2026/04/28/con-el-despliegue-de-700-efectivos-y-18-unidades-de-las-armadas-de-argentina-brasil-uruguay-paraguay-y-bolivia-finalizo-en-mato-grosso-do-sul-el-ejercicio-acrux-xii/" target="_blank" rel="noopener noreferrer">Zona Militar — Finalización ACRUX XII</a></td>
+        <td>700 efectivos, 18 unidades, Complejo Naval de Ladário</td>
+      </tr>
+      <tr>
+        <td><a href="https://www.infodefensa.com/texto-diario/mostrar/3134784/armada-uruguay-plantea-necesidades-hasta-2030" target="_blank" rel="noopener noreferrer">InfoDefensa — Plan de Necesidades 2014–2030</a></td>
+        <td>Declaraciones sobre estado de la flota y necesidad de dos balizadores</td>
+      </tr>
+      <tr>
+        <td><a href="https://www.infodefensa.com/texto-diario/mostrar/3129867/armada-uruguaya-busca-astillero-suministre-nuevo-buque-balizador" target="_blank" rel="noopener noreferrer">InfoDefensa — Concurso nuevo balizador</a></td>
+        <td>Convocatoria internacional para reemplazar al ROU 25 Orión</td>
+      </tr>
+      <tr>
+        <td><a href="https://www.navcen.uscg.gov/ais-class-b-reports" target="_blank" rel="noopener noreferrer">USCG — AIS Class B Reports</a></td>
+        <td>Especificación técnica de mensajes Clase B (Msg 18 y 24) según ITU-R M.1371</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="post-footer">
+    <p>Análisis: <a href="https://x.com/LU1AAT" target="_blank" rel="noopener noreferrer">LU1AAT</a> / CX9CAT — <a href="https://lu1aat.github.io/ais-rio-de-la-plata/" target="_blank" rel="noopener noreferrer">AIS Rio de la Plata</a></p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="../../">← Volver al inicio</a>
+</footer>
+
+<script>
+(function () {
+  const SESSIONS = [
+    {
+      lat: -34.94, lng: -56.115,
+      date: '17 DIC 2025',
+      label: '239 paquetes',
+      sub: 'Op. + tránsito',
+      color: '#f39c12'
+    },
+    {
+      lat: -34.945, lng: -56.15,
+      date: '10 FEB 2026',
+      label: '167 paquetes',
+      sub: 'Operaciones',
+      color: '#e74c3c'
+    },
+    {
+      lat: -34.945, lng: -56.06,
+      date: '26 FEB 2026',
+      label: '134 paquetes',
+      sub: 'Tránsito E',
+      color: '#2ecc71'
+    },
+    {
+      lat: -34.978, lng: -56.13,
+      date: '26 MAR 2026',
+      label: '3 paquetes',
+      sub: 'Captura parcial',
+      color: '#7aaec8'
+    },
+  ];
+
+  const PORT = {
+    lat: -34.9068, lng: -56.2126,
+    date: 'Puerto',
+    label: 'Montevideo 🇺🇾',
+    color: '#2ecc71'
+  };
+
+  const map = L.map('track-map', {
+    center: [-34.94, -56.10],
+    zoom: 11,
+    zoomControl: true
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    opacity: 0.4
+  }).addTo(map);
+
+  function addMarker(pt, isPort) {
+    const cls = isPort ? 'map-marker port' : 'map-marker';
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="${cls}"><span class="mdate">${pt.date}</span>${pt.label}${pt.sub ? '<br><span style="color:#7aaec8;font-size:8.5px">' + pt.sub + '</span>' : ''}</div>`,
+      iconAnchor: [0, 0],
+      iconSize: null
+    });
+    L.marker([pt.lat, pt.lng], { icon })
+      .bindPopup(`<b>${pt.date}</b><br>${pt.label}${pt.sub ? '<br>' + pt.sub : ''}`)
+      .addTo(map);
+
+    L.circleMarker([pt.lat, pt.lng], {
+      radius: 6,
+      fillColor: pt.color,
+      color: '#fff',
+      weight: 1.5,
+      fillOpacity: 1
+    }).addTo(map);
+  }
+
+  SESSIONS.forEach(s => addMarker(s, false));
+  addMarker(PORT, true);
+
+  const allPts = [...SESSIONS, PORT].map(p => [p.lat, p.lng]);
+  map.fitBounds(allPts, { padding: [50, 50] });
+})();
+</script>
+
+</body>
+</html>
